@@ -42,14 +42,14 @@ void readNodesFile(GraphViewer *gv) {
 	int semicolon1, semicolon2, idNode, x, y;
 
 	/* reading nodes */
-	nodesFile.open("nos.txt");
+	nodesFile.open("EvacuationSystem/res/nodes.txt");
 
 	while (getline(nodesFile, line)) {
 		semicolon1 = line.find_first_of(';');
-		idNode = atoi(line.substr(0, semicolon1).c_str());
+		idNode = stoi(line.substr(0, semicolon1));
 		semicolon2 = line.find_last_of(';');
-		x = atoi(line.substr(semicolon1 + 1, semicolon2).c_str());
-		y = atoi(line.substr(semicolon2 + 1).c_str());
+		x = stoi(line.substr(semicolon1 + 1, semicolon2));
+		y = stoi(line.substr(semicolon2 + 1));
 		gv->addNode(idNode, x, y);
 	}
 
@@ -63,14 +63,14 @@ void readEdgesFile(GraphViewer *gv) {
 	int semicolon1, semicolon2, idEdge, idStart, idEnd;
 
 	/* reading edges */
-	edgesFile.open("arestas.txt");
+	edgesFile.open("EvacuationSystem/res/edges.txt");
 
 	while (getline(edgesFile, line)) {
 		semicolon1 = line.find_first_of(';');
 		semicolon2 = line.find_last_of(';');
-		idEdge = atoi(line.substr(0, semicolon1).c_str());
-		idStart = atoi(line.substr(semicolon1 + 1, semicolon2).c_str());
-		idEnd = atoi(line.substr(semicolon2 + 1).c_str());
+		idEdge = stoi(line.substr(0, semicolon1));
+		idStart = stoi(line.substr(semicolon1 + 1, semicolon2));
+		idEnd = stoi(line.substr(semicolon2 + 1));
 		gv->addEdge(idEdge, idStart, idEnd, EdgeType::DIRECTED);
 	}
 

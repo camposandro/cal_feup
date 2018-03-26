@@ -31,7 +31,15 @@
 *.out
 *.app
 
-# Eclipse files
+# Visual studio project files
+Debug/*
+*.vs/*
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# Eclipse project files
 .project
 .cproject
-.settings/
+.settings/*
