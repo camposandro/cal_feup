@@ -6,7 +6,8 @@
 #include "Project.h"
 
 Project* initProj();
-void menu(Project* proj);
-void menuDijkstra(Project* proj);
-void printAllPaths(Project* proj);
-void printPath(std::vector<Node> path);
+void mainMenu(Project* proj);
+int optionsMenu();
+void menuPaths(Project* proj);
+int pathsOptions();
+int processInput(int inf, int sup);

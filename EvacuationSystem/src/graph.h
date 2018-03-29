@@ -31,10 +31,10 @@ public:
 	Vertex(T in);
 	int queueIndex = 0;		// required by MutablePriorityQueue
 	T getInfo();
+	vector<Edge<T>> getAdj();
 	Vertex<T>* getPath();
 	double getDist();
 	bool operator== (const Vertex<T> &v);
-	bool operator< (const Vertex<T> &v);
 	friend class Graph<T>;
 };
 
@@ -44,6 +44,11 @@ Vertex<T>::Vertex(T in) : info(in) {}
 template <class T>
 T Vertex<T>::getInfo() {
 	return info;
+}
+
+template <class T>
+vector<Edge<T>> Vertex<T>::getAdj() {
+	return adj;
 }
 
 template <class T>
@@ -83,9 +88,6 @@ struct vertexPointerGreatherThan {
 	}
 };
 
-
-
-
 /* --------------------------------------------------------- */
 
 /* -------------------- Edge Class ------------------------- */
@@ -95,6 +97,7 @@ class Edge {
 	double weight;         // edge weight
 public:
 	Edge(Vertex<T> *d, double w);
+	Vertex<T>* getDest();
 	double getWeight();
 	bool operator== (const Edge<T> edge);
 	friend class Graph<T>;
@@ -103,6 +106,11 @@ public:
 
 template <class T>
 Edge<T>::Edge(Vertex<T> *d, double w) : dest(d), weight(w) {}
+
+template <class T>
+Vertex<T>* Edge<T>::getDest() {
+	return dest;
+}
 
 template <class T>
 double Edge<T>::getWeight() {

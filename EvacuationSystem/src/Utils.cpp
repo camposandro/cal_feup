@@ -2,85 +2,110 @@
 
 Project* initProj() {
 
-	Project *proj = new Project();
+	cout << "EvacuationSystem - CAL 1718\n";
+	cout << ". Loading graph files ...";
 
-	proj->openWindowGV();
+	Project *proj = new Project();
 	proj->readNodesFile();
-	proj->readEdgesFile();
-	proj->printGV();
+	proj->readEdgesFile();	
+	
+#ifdef _WIN32
+	system("cls");
+#endif
 
 	return proj;
 }
 
-void menu(Project* proj) {
-	menuDijkstra(proj);
+void mainMenu(Project* proj) {
+
+	while (int option = optionsMenu()) {
+		switch (option) {
+		case 0:
+			return;
+		case 1:
+			proj->openWindowGV();
+			proj->loadNodesGV();
+			proj->loadEdgesGV();
+			proj->printGV();
+			break;
+		case 2:
+			break;
+		case 3:
+			menuPaths(proj);
+			break;
+		default:
+			break;
+		}
+	}
 }
 
-void menuDijkstra(Project* proj) {
+int optionsMenu() {
 
-	char answer;
-	int idStart, idDest;
+	cout << "EvacuationSystem - main menu:\n";
+	vector<string> menuOptions = {
+		"-> 1. Open GraphViewer",
+		"-> 2. Report accident",
+		"-> 3. Calculate paths",
+		"-> 0. Leave",
+	};
 
-	cout << "DIJKSTRA SHORTEST PATHS\n";
-
-	cout << "Insert vertex of start (out of " <<
-		proj->getGraph()->getNumVertex() << "): ";
-	cin >> idStart;
-	cin.ignore();
-
-	/* gets starting node */
-	Node start = proj->getNodeById(idStart);
-
-	/* calculates all paths from starting node */
-	proj->getGraph()->dijkstraShortestPath(start);
-
-	do {
-		cout << "Print all paths ? (Y/N) ";
-		cin >> answer;
-		answer = toupper(answer);
-		cin.ignore();
-	} while (answer != 'Y' && answer != 'N');
+	for (string option : menuOptions)
+		cout << option << endl;
 	
-	if (answer == 'N') {
-		cout << "Insert vertex of destination (out of " <<
-			proj->getGraph()->getNumVertex() << "): ";
-		cin >> idDest;
+	int option = processInput(0,3);
+	cout << endl;
+
+	return option;
+}
+
+void menuPaths(Project* proj) {
+
+	while (int option = pathsOptions()) {
+		switch (option) {
+		case 0:
+			return;
+		case 1:
+			proj->computeDijkstra();
+			break;
+		case 2:
+			proj->computeAstar();
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+int pathsOptions() {
+
+	cout << "EvacuationSystem - path searching:\n";
+	vector<string> pathsOptions = {
+		"-> 1. Dijkstra Algorithm",
+		"-> 2. A* Search Algorithm",
+		"-> 0. Return",
+	};
+
+	for (string option : pathsOptions)
+		cout << option << endl;
+
+	int option = processInput(0, 2);
+	cout << endl;
+
+	return option;
+}
+
+int processInput(int inf, int sup) {
+
+	int option;
+	bool validOption;
+	do {
+		validOption = false;
+		cout << "Option: ";
+		cin >> option;
 		cin.ignore();
+		if (option >= inf && option <= sup)
+			validOption = true;
+	} while (!validOption);
 
-		/* gets destination node */
-		Node dest = proj->getNodeById(idDest);
-
-		vector<Node> path = proj->getDijkstraPath(dest);
-		printPath(path);
-	}
-	else {
-		cout << "Paths from Vertex " << start.getId() << ":\n";
-		printAllPaths(proj);
-	}
-}
-
-void printPath(vector<Node> path) {
-	ostringstream pathStr;
-
-	if (path.size() == 1) {
-		pathStr << "No path available!";
-	}
-	else {
-		for (size_t i = path.size() - 1;; i--) {
-			pathStr << path.at(i).getId();
-			if (i == 0) break;
-			else pathStr << "-";
-		}
-	}
-	cout << pathStr.str() << endl;
-}
-
-void printAllPaths(Project* proj) {
-	for (Vertex<Node>* vertex : proj->getGraph()->getVertexSet()) {
-		vector<Node> path = proj->getDijkstraPath(vertex->getInfo());
-		if (path.size() != 1) {
-			cout << "to Vertex " << vertex->getInfo().getId() << ": ";
-			printPath(path);
-		}
-	}
+	return option;
 }

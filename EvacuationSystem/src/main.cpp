@@ -6,7 +6,7 @@
 int main() {
 
 	Project* proj = initProj();
-	menu(proj);
+	mainMenu(proj);
 	
 	return 0;
 }

@@ -48,7 +48,6 @@ void Project::readNodesFile() {
 		y = stoi(line.substr(semicolon2 + 1));
 		
 		graph->addVertex(Node(idNode, x, y));
-		gv->addNode(idNode, x, y);
 	}
 	
 	nodesFile.close();
@@ -77,11 +76,31 @@ void Project::readEdgesFile() {
 			+ pow(startNode.getCoords().getY() - endNode.getCoords().getY(), 2));
 
 		graph->addEdge(startNode, endNode, weight);
-		gv->addEdge(idEdge, idStart, idEnd, EdgeType::DIRECTED);
-		gv->setEdgeLabel(idEdge, to_string((int) weight));
 	}
 	
 	edgesFile.close();
+}
+
+void Project::loadNodesGV() {
+
+	for (Vertex<Node>* vertex : graph->getVertexSet()) {
+		Node node = vertex->getInfo();
+		gv->addNode(node.getId(), node.getCoords().getX(), node.getCoords().getY());
+	}
+}
+
+void Project::loadEdgesGV() {
+
+	int edgeId = 1;
+	for (Vertex<Node>* vertex : graph->getVertexSet()) {
+		Node startNode = vertex->getInfo();
+		for (Edge<Node> e : vertex->getAdj()) {
+			Node destNode = e.getDest()->getInfo();
+			gv->addEdge(edgeId, startNode.getId(), destNode.getId(), EdgeType::DIRECTED);
+			gv->setEdgeLabel(edgeId, to_string(e.getWeight()));
+			edgeId++;
+		} 
+	}
 }
 
 Node Project::getNodeById(int idNode) {
@@ -89,6 +108,48 @@ Node Project::getNodeById(int idNode) {
 		if (node->getInfo().getId() == idNode) {
 			return node->getInfo();
 		}
+	}
+	return Node();
+}
+
+void Project::computeDijkstra() {
+
+	char answer;
+	int idStart, idDest;
+
+	cout << "Insert vertex of start (out of " <<
+		graph->getNumVertex() << "): ";
+	cin >> idStart;
+	cin.ignore();
+
+	/* gets starting node */
+	Node start = getNodeById(idStart);
+
+	/* calculates all paths from starting node */
+	graph->dijkstraShortestPath(start);
+
+	do {
+		cout << "Print all paths ? (Y/N) ";
+		cin >> answer;
+		answer = toupper(answer);
+		cin.ignore();
+	} while (answer != 'Y' && answer != 'N');
+
+	if (answer == 'N') {
+		cout << "Insert vertex of destination (out of " <<
+			graph->getNumVertex() << "): ";
+		cin >> idDest;
+		cin.ignore();
+
+		/* gets destination node */
+		Node dest = getNodeById(idDest);
+
+		vector<Node> path = getDijkstraPath(dest);
+		this->printPath(path);
+	}
+	else {
+		cout << endl << "Paths from Vertex " << start.getId() << ":\n";
+		this->printAllPaths();
 	}
 }
 
@@ -102,4 +163,35 @@ vector<Node> Project::getDijkstraPath(Node dest) {
 	} while (v != NULL);
 
 	return fullPath;
+}
+
+void Project::computeAstar() {
+
+}
+
+void Project::printPath(vector<Node> path) {
+	ostringstream pathStr;
+
+	if (path.size() == 1) {
+		pathStr << "No path available!";
+	}
+	else {
+		for (size_t i = path.size() - 1;; i--) {
+			pathStr << path.at(i).getId();
+			if (i == 0) break;
+			else pathStr << "-";
+		}
+	}
+	cout << pathStr.str() << endl;
+}
+
+void Project::printAllPaths() {
+	for (Vertex<Node>* vertex : graph->getVertexSet()) {
+		vector<Node> path = getDijkstraPath(vertex->getInfo());
+		if (path.size() != 1) {
+			cout << "to Vertex " << vertex->getInfo().getId() << ": ";
+			printPath(path);
+		}
+	}
+	cout << endl;
 }
