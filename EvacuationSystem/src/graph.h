@@ -2,11 +2,16 @@
 
 #include <vector>
 #include <queue>
+#include <list>
+#include <limits>
+#include <cmath>
 using namespace std;
 
 template <class T> class Edge;
 template <class T> class Graph;
 template <class T> class Vertex;
+
+#define INF std::numeric_limits<double>::max()
 
 /* -------------------- Vertex Class ------------------------- */
 template <class T>
@@ -17,11 +22,19 @@ class Vertex {
 	bool processing;       // auxiliary field used by isDAG
 	int indegree;          // auxiliary field used by topsort
 
+	Vertex<T> *path;		// path to last vertex of the path
+	double dist;			// distance to the last vertex of the path
+
 	void addEdge(Vertex<T> *dest, double w);
 	bool removeEdgeTo(Vertex<T> *d);
 public:
 	Vertex(T in);
+	int queueIndex = 0;		// required by MutablePriorityQueue
 	T getInfo();
+	Vertex<T>* getPath();
+	double getDist();
+	bool operator== (const Vertex<T> &v);
+	bool operator< (const Vertex<T> &v);
 	friend class Graph<T>;
 };
 
@@ -31,6 +44,16 @@ Vertex<T>::Vertex(T in) : info(in) {}
 template <class T>
 T Vertex<T>::getInfo() {
 	return info;
+}
+
+template <class T>
+Vertex<T>* Vertex<T>::getPath() {
+	return path;
+}
+
+template <class T>
+double Vertex<T>::getDist() {
+	return dist;
 }
 
 template <class T>
@@ -47,6 +70,22 @@ bool Vertex<T>::removeEdgeTo(Vertex<T> *d) {
 		}
 	return false;
 }
+
+template <class T>
+bool Vertex<T>::operator== (const Vertex<T> &v) {
+	return info == v.info && adj == v.adj;
+}
+
+template <class T>
+struct vertexPointerGreatherThan {
+	bool operator()(Vertex<T>* v1, Vertex<T>* v2) {
+		return v1->getDist() > v2->getDist();
+	}
+};
+
+
+
+
 /* --------------------------------------------------------- */
 
 /* -------------------- Edge Class ------------------------- */
@@ -83,7 +122,6 @@ class Graph {
 	vector<Vertex<T> *> vertexSet;    // vertex set
 
 	void dfsVisit(Vertex<T> *v, vector<T> & res) const;
-	Vertex<T> *findVertex(const T &in) const;
 	bool dfsIsDAG(Vertex<T> *v) const;
 public:
 	vector<Vertex<T> *> getVertexSet();
@@ -97,6 +135,9 @@ public:
 	vector<T> topsort() const;
 	int maxNewChildren(const T &source, T &inf) const;
 	bool isDAG() const;
+
+	Vertex<T> *findVertex(const T &in) const;
+	void dijkstraShortestPath(const T &s);
 };
 
 template<class T>
@@ -304,4 +345,51 @@ bool Graph<T>::dfsIsDAG(Vertex<T> *v) const {
 	v->processing = false;
 	return true;
 }
+
+template<class T>
+void Graph<T>::dijkstraShortestPath(const T & s)
+{
+	vector<Vertex<T>*> p_queue;
+
+	// initializing all vertices
+	for (Vertex<T> *v : vertexSet) {
+		v->dist = INF;
+		v->path = NULL;
+		v->processing = false;
+	}
+	
+	// get initial vertex
+	Vertex<T> *v = findVertex(s);
+	// set its distance to 0
+	v->dist = 0;
+	p_queue.push_back(v);
+
+	make_heap(p_queue.begin(), p_queue.end());
+
+	while (!p_queue.empty()) {
+		Vertex<T> *v = p_queue.front();
+
+		p_queue.pop_back();
+		// pop vertex of minimum distance out of the heap
+		pop_heap(p_queue.begin(), p_queue.end());
+
+		for (Edge<T> e : v->adj) {
+			Vertex<T> *w = e.dest;
+			if (w->dist > v->dist + e.weight) {
+				w->dist = v->dist + e.weight;
+				w->path = v;
+				
+				// if vertex is not in p_queue, insert it
+				if (!w->processing) {
+					w->processing = true;
+					p_queue.push_back(w);
+				}
+				
+				// reorganize p_queue - vertex of lower distance in the back
+				make_heap(p_queue.begin(), p_queue.end(), vertexPointerGreatherThan<T>());
+			}
+		}
+	}
+}
+
 /* ------------------------------------------------------- */

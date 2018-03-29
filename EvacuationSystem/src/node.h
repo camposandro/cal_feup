@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "graph.h"
+#include "Graph.h"
 
 /* ------------------ Point Class ------------------- */
 class Point {

@@ -1,4 +1,4 @@
-#include "project.h"
+#include "Project.h"
 
 Project::Project() {
 	this->graph = new Graph<Node>();
@@ -78,17 +78,28 @@ void Project::readEdgesFile() {
 
 		graph->addEdge(startNode, endNode, weight);
 		gv->addEdge(idEdge, idStart, idEnd, EdgeType::DIRECTED);
+		gv->setEdgeLabel(idEdge, to_string((int) weight));
 	}
 	
 	edgesFile.close();
 }
 
 Node Project::getNodeById(int idNode) {
-
-	for (auto node : graph->getVertexSet()) {
+	for (Vertex<Node>* node : graph->getVertexSet()) {
 		if (node->getInfo().getId() == idNode) {
 			return node->getInfo();
 		}
 	}
-	return Node();
+}
+
+vector<Node> Project::getDijkstraPath(Node dest) {
+	vector<Node> fullPath;
+
+	Vertex<Node>* v = graph->findVertex(dest);
+	do {
+		fullPath.push_back(v->getInfo());
+		v = v->getPath();
+	} while (v != NULL);
+
+	return fullPath;
 }

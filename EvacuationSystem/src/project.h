@@ -2,9 +2,9 @@
 
 #include <fstream>
 
-#include "graph.h"
-#include "graphviewer.h"
-#include "node.h"
+#include "Graph.h"
+#include "Graphviewer.h"
+#include "Node.h"
 
 /* MACROS definition */
 #define GRAPH_WIDTH		600
@@ -13,7 +13,6 @@
 class Project {
 
 private:
-
 	Graph<Node> *graph;
 	GraphViewer *gv;
 
@@ -23,9 +22,10 @@ public:
 	GraphViewer *getGV();
 	void setGraph(Graph<Node> *graph);
 	void setGV(GraphViewer *gv);
-	void openWindowGV();
-	void printGV();
 	void readNodesFile();
 	void readEdgesFile();
+	void openWindowGV();
+	void printGV();
 	Node getNodeById(int idNode);
+	vector<Node> getDijkstraPath(Node dest);
 };

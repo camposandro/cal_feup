@@ -1,6 +1,6 @@
 #pragma once
 
-#include "node.h"
+#include "Node.h"
 
 Point::Point() {
 	coords.first = -1;
