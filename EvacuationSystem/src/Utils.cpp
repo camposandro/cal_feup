@@ -3,15 +3,28 @@
 Project* initProj() {
 
 	cout << "EvacuationSystem - CAL 1718\n";
-	cout << ". Loading graph files ...";
+	cout << ". Loading graph files ...\n";
 
 	Project *proj = new Project();
+
+	auto start = chrono::high_resolution_clock::now();
 	proj->readNodesFile();
-	proj->readEdgesFile();	
+	proj->readEdgesFile();
+	proj->readTrafficFile();
+	auto finish = chrono::high_resolution_clock::now();
+
+	auto elapsed = chrono::duration_cast<chrono::microseconds>(finish - start).count();
+	cout << ". Files reading time (micro-seconds) = " << elapsed << endl;
+	Sleep(3000);
 	
-#ifdef _WIN32
-	system("cls");
-#endif
+	proj->openWindowGv();
+	proj->loadNodesGv();
+	proj->loadEdgesGv();
+	proj->printGv();
+
+	#ifdef _WIN32
+		system("cls");
+	#endif
 
 	return proj;
 }
@@ -23,15 +36,13 @@ void mainMenu(Project* proj) {
 		case 0:
 			return;
 		case 1:
-			proj->openWindowGV();
-			proj->loadNodesGV();
-			proj->loadEdgesGV();
-			proj->printGV();
+			menuPaths(proj);
 			break;
 		case 2:
+			proj->divertTraffic();
 			break;
 		case 3:
-			menuPaths(proj);
+			proj->reportAccident();
 			break;
 		default:
 			break;
@@ -43,9 +54,9 @@ int optionsMenu() {
 
 	cout << "EvacuationSystem - main menu:\n";
 	vector<string> menuOptions = {
-		"-> 1. Open GraphViewer",
-		"-> 2. Report accident",
-		"-> 3. Calculate paths",
+		"-> 1. Calculate shortest routes",
+		"-> 2. Divert current traffic",
+		"-> 3. Report accidents",
 		"-> 0. Leave",
 	};
 
@@ -65,10 +76,10 @@ void menuPaths(Project* proj) {
 		case 0:
 			return;
 		case 1:
-			proj->computeDijkstra();
+			proj->testDijkstra();
 			break;
 		case 2:
-			proj->computeAstar();
+			proj->testAstar();
 			break;
 		default:
 			break;
@@ -100,7 +111,7 @@ int processInput(int inf, int sup) {
 	bool validOption;
 	do {
 		validOption = false;
-		cout << "Option: ";
+		cout << ". Option: ";
 		cin >> option;
 		cin.ignore();
 		if (option >= inf && option <= sup)
