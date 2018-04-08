@@ -3,8 +3,8 @@
 #include "Node.h"
 
 Point::Point() {
-	coords.first = -1;
-	coords.second = -1;
+	coords.first = 0;
+	coords.second = 0;
 }
 
 Point::Point(int x, int y) {
@@ -28,19 +28,19 @@ void Point::setY(int y) {
 	coords.second = y;
 }
 
-bool Point::operator==(const Point & point)
-{
+bool Point::operator==(const Point & point) {
 	return coords.first == point.coords.first &&
 		coords.second == point.coords.second;
 }
 
-Node::Node() {
-	this->id = -1;
+
+int Node::nodeId = 1;
+
+Node::Node() : id(nodeId++) {
 	this->coords = Point();
 }
 
-Node::Node(int id, int x, int y) {
-	this->id = id;
+Node::Node(int x, int y) : id(nodeId++) {
 	this->coords = Point(x,y);
 }
 
@@ -68,12 +68,16 @@ void Node::setAdj(std::vector<Edge<int>> adj) {
 	this->adj = adj;
 }
 
-bool Node::operator==(const Node &node)
-{
+double Node::calcDist(Node n) {
+	return sqrt(pow(coords.getX() - n.coords.getX(), 2)
+		+ pow(coords.getY() - n.coords.getY(), 2));
+}
+
+bool Node::operator==(const Node &node) {
 	for (auto edge : adj)
 		for (auto edgeAux : node.adj)
 			if (!(edge == edgeAux))
 				return false;
-
+	
 	return id == node.id && coords == node.coords;
 }

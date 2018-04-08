@@ -7,11 +7,17 @@ Project* initProj() {
 
 	Project *proj = new Project();
 	proj->readNodesFile();
-	proj->readEdgesFile();	
+	proj->readEdgesFile();
+	proj->readTrafficFile();
 	
-#ifdef _WIN32
-	system("cls");
-#endif
+	proj->openWindowGv();
+	proj->loadNodesGv();
+	proj->loadEdgesGv();
+	proj->printGv();
+
+	#ifdef _WIN32
+		system("cls");
+	#endif
 
 	return proj;
 }
@@ -23,15 +29,10 @@ void mainMenu(Project* proj) {
 		case 0:
 			return;
 		case 1:
-			proj->openWindowGV();
-			proj->loadNodesGV();
-			proj->loadEdgesGV();
-			proj->printGV();
+			menuPaths(proj);
 			break;
 		case 2:
-			break;
-		case 3:
-			menuPaths(proj);
+			proj->reportAccident();
 			break;
 		default:
 			break;
@@ -43,16 +44,15 @@ int optionsMenu() {
 
 	cout << "EvacuationSystem - main menu:\n";
 	vector<string> menuOptions = {
-		"-> 1. Open GraphViewer",
+		"-> 1. Calculate shortest paths",
 		"-> 2. Report accident",
-		"-> 3. Calculate paths",
 		"-> 0. Leave",
 	};
 
 	for (string option : menuOptions)
 		cout << option << endl;
 	
-	int option = processInput(0,3);
+	int option = processInput(0,2);
 	cout << endl;
 
 	return option;
@@ -65,10 +65,10 @@ void menuPaths(Project* proj) {
 		case 0:
 			return;
 		case 1:
-			proj->computeDijkstra();
+			proj->testDijkstra();
 			break;
 		case 2:
-			proj->computeAstar();
+			proj->testAstar();
 			break;
 		default:
 			break;
@@ -109,3 +109,16 @@ int processInput(int inf, int sup) {
 
 	return option;
 }
+
+//void Project::test_performance_dijkstra() {
+//	cout << "Dijkstra processing graph ..." << endl;
+//
+//	auto start = std::chrono::high_resolution_clock::now();
+//	for (Vertex<Node> *vertex : graph->getVertexSet())
+//		graph->dijkstraShortestPath(vertex->getInfo());
+//	auto finish = std::chrono::high_resolution_clock::now();
+//
+//	auto elapsed = std::chrono::duration_cast<chrono::microseconds>(finish - start).count();
+//	cout << "Dijkstra processing average time (micro-seconds) = "
+//		<< (elapsed / (GRAPH_WIDTH * GRAPH_HEIGHT)) << endl;
+//}

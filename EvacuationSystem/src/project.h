@@ -2,14 +2,16 @@
 
 #include <fstream>
 #include <sstream>
-
+#include <ctime>
 #include "Graph.h"
 #include "Graphviewer.h"
 #include "Node.h"
 
-/* MACROS definition */
-#define GRAPH_WIDTH		600
-#define GRAPH_HEIGHT	600
+#define WINDOW_WIDTH	600
+#define WINDOW_HEIGHT	600
+#define NODES_FILE		"EvacuationSystem/res/nodes.txt"
+#define EDGES_FILE		"EvacuationSystem/res/edges.txt"
+#define TRAFFIC_FILE	"EvacuationSystem/res/traffic.txt"
 
 class Project {
 
@@ -23,16 +25,25 @@ public:
 	GraphViewer *getGV();
 	void setGraph(Graph<Node> *graph);
 	void setGV(GraphViewer *gv);
+
 	void readNodesFile();
 	void readEdgesFile();
-	void openWindowGV();
-	void loadNodesGV();
-	void loadEdgesGV();
-	void printGV();
-	Node getNodeById(int idNode);
-	void computeDijkstra();
-	vector<Node> getDijkstraPath(Node dest);
-	void computeAstar();
+	void readTrafficFile();
+
+	void openWindowGv();
+	void loadNodesGv();
+	void loadEdgesGv();
+	void printGv();
+	void updateGv();
+	void resetGv();
+
+	void testDijkstra();
+	void testAstar();
+
+	Vertex<Node>* getVertexByNodeId(int idNode);
+	vector<Edge<Node>*> getDijkstraPath(Node dest);
 	void printAllPaths();
-	void printPath(vector<Node> path);
+	void printPath(vector<Edge<Node>*> path);
+
+	void reportAccident();
 };
