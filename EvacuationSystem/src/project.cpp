@@ -171,7 +171,7 @@ void Project::testDijkstra() {
 		cout << "-> Insert vertex of start: ";
 		cin >> idStart;
 		cin.ignore();
-
+		
 		if (idStart > 0 && idStart < graph->getNumVertex())
 			validIndex = true;
 		else
