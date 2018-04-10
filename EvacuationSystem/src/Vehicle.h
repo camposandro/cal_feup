@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include "Node.h"
 
 class Vehicle {
@@ -12,7 +13,9 @@ private:
 
 public:
 	Vehicle(Node s, Node d);
-	int getId();
-	Node getStartNode();
-	Node getDestNode();
+	int getId() const;
+	Node getStartNode() const;
+	Node getDestNode() const;
+	void resetVehicleId();
+	friend ostream& operator<<(ostream &out, const Vehicle v);
 };

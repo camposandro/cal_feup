@@ -7,10 +7,10 @@
 #include <chrono>
 #include "Project.h"
 
-Project* initProj();
 void graphSelectionMenu(Project * proj);
+int graphSelectionOptions();
 void mainMenu(Project* proj);
-int optionsMenu();
-void menuPaths(Project* proj);
+int mainMenuOptions();
+void pathsMenu(Project* proj);
 int pathsOptions();
 int processInput(int inf, int sup);

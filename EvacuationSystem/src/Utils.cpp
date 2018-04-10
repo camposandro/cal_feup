@@ -1,74 +1,97 @@
 #include "Utils.h"
 
-Project* initProj() {
+void graphSelectionMenu(Project * proj) {
 
-	cout << "EvacuationSystem - CAL 1718\n";
-	Project *proj = new Project();
-	graphSelectionMenu(proj);
+	chrono::high_resolution_clock::time_point start, finish;
+	_int64 elapsed;
 
-	proj->openWindowGv();
-	proj->loadNodesGv();
-	proj->loadEdgesGv();
-	proj->printGv();
+	while (int option = graphSelectionOptions()) {
+		switch (option) {
+
+		case 1:
+			cout << ". Loading files ...\n";
+			start = chrono::high_resolution_clock::now();
+			proj->readNodesFile();
+			proj->readEdgesFile();
+			proj->readTrafficFile();
+			finish = chrono::high_resolution_clock::now();
+
+			elapsed = chrono::duration_cast<chrono::microseconds>(finish - start).count();
+			cout << ". Files reading time (micro-seconds) = " << elapsed << endl << endl;
+			
+			Sleep(3000);
+			break;
+
+		case 2:
+			start = chrono::high_resolution_clock::now();
+			proj->generateRandomGraph();
+			finish = chrono::high_resolution_clock::now();
+			elapsed = chrono::duration_cast<chrono::microseconds>(finish - start).count();
+			cout << ". Random graph created in (micro-seconds) = " << elapsed << endl;
+
+			start = chrono::high_resolution_clock::now();
+			proj->generateRandomTraffic();
+			finish = chrono::high_resolution_clock::now();
+			elapsed = chrono::duration_cast<chrono::microseconds>(finish - start).count();
+			cout << ". Random traffic created in (micro-seconds) = " << elapsed << endl << endl;
+
+			Sleep(3000);
+			break;
+		}
+		
+		#ifdef _WIN32
+			system("cls");
+		#endif
+
+		proj->openWindowGv();
+		proj->loadNodesGv();
+		proj->loadEdgesGv();
+		proj->printGv();
+		mainMenu(proj);
+	}
+}
+
+int graphSelectionOptions() {
 
 	#ifdef _WIN32
 		system("cls");
 	#endif
 
-	return proj;
-}
-
-void graphSelectionMenu(Project * proj) {
-
-	vector<string> menuOptions = {
+	cout << "EvacuationSystem - CAL 1718\n";
+	vector<string> graphOptions = {
 		"-> 1. Load graph from files",
 		"-> 2. Generate random graph",
 		"-> 0. Leave",
 	};
 
-	for (string option : menuOptions)
+	for (string option : graphOptions)
 		cout << option << endl;
 
 	int option = processInput(0, 2);
 	cout << endl;
 
-	switch (option) {
-
-	case 1:
-	{
-		cout << ". Loading graph files ...\n";
-		auto start = chrono::high_resolution_clock::now();
-		proj->readNodesFile();
-		proj->readEdgesFile();
-		proj->readTrafficFile();
-		auto finish = chrono::high_resolution_clock::now();
-
-		auto elapsed = chrono::duration_cast<chrono::microseconds>(finish - start).count();
-		cout << ". Files reading time (micro-seconds) = " << elapsed << endl;
-
-		Sleep(3000);
-		break;
-	}
-	case 2:
-		proj->generateRandomGraph();
-		proj->generateRandomTraffic();
-		break;
-	}
+	return option;
 }
 
 void mainMenu(Project* proj) {
-
-	while (int option = optionsMenu()) {
+	int option;
+	while ((option = mainMenuOptions()) >= 0) {
 		switch (option) {
 		case 0:
+			proj->resetGraph();
+			proj->resetTraffic();
+			proj->resetGv();
 			return;
 		case 1:
-			menuPaths(proj);
+			pathsMenu(proj);
 			break;
 		case 2:
 			proj->divertTraffic();
 			break;
 		case 3:
+			proj->printTraffic();
+			break;
+		case 4:
 			proj->reportAccident();
 			break;
 		default:
@@ -77,31 +100,30 @@ void mainMenu(Project* proj) {
 	}
 }
 
-int optionsMenu() {
+int mainMenuOptions() {
 
 	cout << "EvacuationSystem - main menu:\n";
 	vector<string> menuOptions = {
 		"-> 1. Calculate shortest routes",
 		"-> 2. Divert current traffic",
-		"-> 3. Report accidents",
+		"-> 3. Watch current traffic",
+		"-> 4. Report accidents",
 		"-> 0. Leave",
 	};
 
 	for (string option : menuOptions)
 		cout << option << endl;
 	
-	int option = processInput(0,3);
+	int option = processInput(0,4);
 	cout << endl;
 
 	return option;
 }
 
-void menuPaths(Project* proj) {
+void pathsMenu(Project* proj) {
 
 	while (int option = pathsOptions()) {
 		switch (option) {
-		case 0:
-			return;
 		case 1:
 			proj->testDijkstra();
 			break;

@@ -12,11 +12,11 @@ Point::Point(int x, int y) {
 	coords.second = y;
 }
 
-int Point::getX() {
+int Point::getX() const {
 	return coords.first;
 }
 
-int Point::getY() {
+int Point::getY() const {
 	return coords.second;
 }
 
@@ -44,15 +44,15 @@ Node::Node(int x, int y) : id(nodeId++) {
 	this->coords = Point(x,y);
 }
 
-int Node::getId() {
+int Node::getId() const {
 	return id;
 }
 
-Point Node::getCoords() {
+Point Node::getCoords() const {
 	return coords;
 }
 
-std::vector<Edge<Node>*>Node::getAdj() {
+std::vector<Edge<Node>*>Node::getAdj() const {
 	return adj;
 }
 
@@ -78,6 +78,10 @@ Edge<Node>* Node::findEdge(Node n) {
 		if (edge->getDest()->getInfo() == n)
 			return edge;
 	return NULL;
+}
+
+void Node::resetNodeId() {
+	nodeId = 1;
 }
 
 bool Node::operator==(const Node &node) {
