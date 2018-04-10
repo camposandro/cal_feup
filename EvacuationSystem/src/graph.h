@@ -146,6 +146,7 @@ public:
 
 	Vertex<T> *findVertex(const T &in) const;
 	void dijkstraShortestPath(const T &s);
+	void AstarShortestPath(const T &s, const T &e);
 };
 
 template<class T>
@@ -398,6 +399,55 @@ void Graph<T>::dijkstraShortestPath(const T & s)
 			}
 		}
 	}
+}
+
+template<class T>
+void Graph<T>::AstarShortestPath(const T & s, const T & f){
+
+	vector<Vertex<T>*> open_list;
+	vector<Vertex<T>*> closed_list;
+
+	for (Vertex<T>* v: vertexSet) {
+			v->dist = INF;
+			v->path = NULL;
+			v->processing = true;
+			open_list.push_back(v);
+	}
+
+	Vertex<T> *v = findVertex(s);
+	v->dist = 0;
+
+	make_heap(open_list.begin(), open_list.end(), vertexPointerGreatherThan<T>());
+
+	while(!open_list.empty()){
+
+		//find the node with lower dist on the open list and pop it
+		pop_heap(open_list.begin(), open_list.end(), vertexPointerGreatherThan<T>());
+		Vertex<T>* q = open_list.back();
+
+
+		for(Edge<T> e : q->adj){
+			Vertex<T> *d = e.dest;
+
+			//if d is the target node(f)
+			if(d == f)
+				return;
+
+			if(d->processing){
+
+				if(d->dist > q->dist + e.weight){
+					d->dist = q->dist + e.weight;
+					d->path = q;
+				}
+
+			}
+
+		}
+
+		q->processing = false;
+		closed_list.push_back(q);
+	}
+
 }
 
 /* ------------------------------------------------------- */

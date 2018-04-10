@@ -94,10 +94,10 @@ void Project::loadEdgesGV() {
 	int edgeId = 1;
 	for (Vertex<Node>* vertex : graph->getVertexSet()) {
 		Node startNode = vertex->getInfo();
-		for (Edge<Node> e : vertex->getAdj()) {
-			Node destNode = e.getDest()->getInfo();
+		for (Edge<Node>* e : vertex->getAdj()) {
+			Node destNode = e->getDest()->getInfo();
 			gv->addEdge(edgeId, startNode.getId(), destNode.getId(), EdgeType::DIRECTED);
-			gv->setEdgeLabel(edgeId, to_string(e.getWeight()));
+			gv->setEdgeLabel(edgeId, to_string(e->getWeight()));
 			edgeId++;
 		} 
 	}
