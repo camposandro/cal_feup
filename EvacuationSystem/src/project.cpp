@@ -10,6 +10,20 @@ Graph<Node>* Project::getGraph() {
 	return graph;
 }
 
+void Project::resetGraph() {
+
+	for (Vertex<Node>* v : graph->getVertexSet()) {
+		for (Edge<Node>* e : v->getAdj())
+			graph->removeEdge(e);
+		graph->removeVertex(v->getInfo());
+	}
+
+	while (!traffic.empty())
+		traffic.pop();
+
+	this->resetGv();
+}
+
 GraphViewer* Project::getGV() {
 	return gv;
 }
@@ -26,7 +40,7 @@ void Project::openWindowGv() {
 	gv->createWindow(600, 600);
 	gv->defineVertexColor("blue");
 	gv->defineEdgeColor("black");
-	gv->defineEdgeCurved(false);
+	//gv->defineEdgeCurved(false);
 }
 
 void Project::printGv() {
@@ -53,6 +67,49 @@ void Project::resetGv() {
 			gv->setEdgeColor(edge->getId(), BLACK);
 			gv->setEdgeThickness(edge->getId(), 1);
 		}
+	}
+}
+
+void Project::generateRandomGraph() {
+	int numNodes, numEdges, destIndex;
+
+	numNodes = rand() % 30;
+	for (int i = 0; i < numNodes; i++)
+		graph->addVertex(Node(rand() % 600, rand() % 600));
+
+	for (Vertex<Node>* v : graph->getVertexSet()) {
+		Node startNode = v->getInfo();
+		
+		do {
+			numEdges = rand() % 4;
+		} while (numEdges == 0);
+		
+		for (int j = 0; j < numEdges; j++) {
+			Node destNode;
+			do {
+				destIndex = rand() % graph->getNumVertex();
+				destNode = graph->getVertexSet().at(destIndex)->getInfo();
+			} while (startNode == destNode || startNode.findEdge(destNode) != NULL);
+			
+			graph->addEdge(startNode, destNode, startNode.calcDist(destNode));
+		}
+	}
+}
+
+void Project::generateRandomTraffic() {
+	int numVehicles, startIndex, destIndex;
+
+	numVehicles = rand() % 10;
+	for (int i = 0; i < numVehicles; i++) {
+		startIndex = rand() % graph->getNumVertex();
+		do {
+			destIndex = rand() % graph->getNumVertex();
+		} while (startIndex == destIndex);
+
+		Node startNode = graph->findVertexByIndex(startIndex)->getInfo();
+		Node destNode = graph->findVertexByIndex(destIndex)->getInfo();
+		
+		traffic.push(new Vehicle(startNode, destNode));
 	}
 }
 
@@ -328,16 +385,18 @@ void Project::reportAccident() {
 		cin.ignore();
 
 		e = graph->findEdgeById(id);
-		if (e == NULL)
-			cout << ". Edge inserted does not exist!";
-		cout << endl;
+		if (id != 0) {
+			if (e == NULL)
+				cout << ". Edge inserted does not exist!\n";
+			else
+				if (graph->removeEdge(e)) {
+					gv->setEdgeThickness(e->getId(), 3);
+					gv->setEdgeColor(e->getId(), RED);
+					printGv();
+				}
+				else cout << ". Could not remove edge!\n";
+		}
+	} while (id != 0);
 
-	} while (e == NULL && id != 0);
-
-	if (graph->removeEdge(e)) {
-		gv->setEdgeThickness(e->getId(), 3);
-		gv->setEdgeColor(e->getId(), RED);
-		printGv();
-	}
-	else cout << ". Could not remove edge!";
+	cout << endl;
 }

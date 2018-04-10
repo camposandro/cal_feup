@@ -52,7 +52,7 @@ Point Node::getCoords() {
 	return coords;
 }
 
-std::vector<Edge<int>>Node::getAdj() {
+std::vector<Edge<Node>*>Node::getAdj() {
 	return adj;
 }
 
@@ -64,13 +64,20 @@ void Node::setCoords(Point coords) {
 	this->coords = coords;
 }
 
-void Node::setAdj(std::vector<Edge<int>> adj) {
+void Node::setAdj(std::vector<Edge<Node>*> adj) {
 	this->adj = adj;
 }
 
 double Node::calcDist(Node n) {
 	return sqrt(pow(coords.getX() - n.coords.getX(), 2)
 		+ pow(coords.getY() - n.coords.getY(), 2));
+}
+
+Edge<Node>* Node::findEdge(Node n) {
+	for (auto edge : adj)
+		if (edge->getDest()->getInfo() == n)
+			return edge;
+	return NULL;
 }
 
 bool Node::operator==(const Node &node) {

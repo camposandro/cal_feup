@@ -177,8 +177,10 @@ public:
 	int maxNewChildren(const T &source, T &inf) const;
 	bool isDAG() const;
 
+	Vertex<T>* findVertexByIndex(int idx) const;
 	Vertex<T>* findVertex(const T &in) const;
 	Edge<T>* findEdgeById(int idx) const;
+
 	void randomizeNumVehicles();
 	void dijkstraShortestPath(const T &s);
 };
@@ -209,6 +211,11 @@ bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
 		return false;
 	v1->addEdge(v2, w);
 	return true;
+}
+
+template <class T>
+Vertex<T>* Graph<T>::findVertexByIndex(int idx) const {
+	return vertexSet.at(idx);
 }
 
 template <class T>
@@ -463,5 +470,3 @@ void Graph<T>::dijkstraShortestPath(const T & s) {
 		}
 	}
 }
-
-/* ------------------------------------------------------- */

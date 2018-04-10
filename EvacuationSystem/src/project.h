@@ -29,6 +29,9 @@ public:
 	void setGraph(Graph<Node> *graph);
 	void setGV(GraphViewer *gv);
 
+	void resetGraph();
+	void generateRandomGraph();
+	void generateRandomTraffic();
 	void readNodesFile();
 	void readEdgesFile();
 	void readTrafficFile();
