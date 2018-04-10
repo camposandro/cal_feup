@@ -3,11 +3,25 @@
 Project::Project() {
 	srand((unsigned int) time(NULL));
 	this->graph = new Graph<Node>();
-	this->gv = new GraphViewer(WINDOW_WIDTH, WINDOW_HEIGHT, false);
+	this->gv = new GraphViewer(GRAPH_WIDTH, GRAPH_HEIGHT, false);
 }
 
 Graph<Node>* Project::getGraph() {
 	return graph;
+}
+
+void Project::resetGraph() {
+
+	for (Vertex<Node>* v : graph->getVertexSet()) {
+		for (Edge<Node>* e : v->getAdj())
+			graph->removeEdge(e);
+		graph->removeVertex(v->getInfo());
+	}
+
+	while (!traffic.empty())
+		traffic.pop();
+
+	this->resetGv();
 }
 
 GraphViewer* Project::getGV() {
@@ -26,7 +40,7 @@ void Project::openWindowGv() {
 	gv->createWindow(600, 600);
 	gv->defineVertexColor("blue");
 	gv->defineEdgeColor("black");
-	gv->defineEdgeCurved(false);
+	//gv->defineEdgeCurved(false);
 }
 
 void Project::printGv() {
@@ -36,8 +50,11 @@ void Project::printGv() {
 void Project::updateGv() {
 	for (Vertex<Node>* vertex : graph->getVertexSet()) {
 		for (Edge<Node>* e : vertex->getAdj()) {
-			string label = to_string(e->getCurrentNumVehicles()) +
+
+			string label = "ID " + to_string(e->getId()) + " - " +
+				to_string(e->getCurrentNumVehicles()) +
 				" | " + to_string(e->getMaxNumVehicles());
+
 			gv->setEdgeLabel(e->getId(), label);
 		}
 	}
@@ -50,6 +67,49 @@ void Project::resetGv() {
 			gv->setEdgeColor(edge->getId(), BLACK);
 			gv->setEdgeThickness(edge->getId(), 1);
 		}
+	}
+}
+
+void Project::generateRandomGraph() {
+	int numNodes, numEdges, destIndex;
+
+	numNodes = rand() % 30;
+	for (int i = 0; i < numNodes; i++)
+		graph->addVertex(Node(rand() % 600, rand() % 600));
+
+	for (Vertex<Node>* v : graph->getVertexSet()) {
+		Node startNode = v->getInfo();
+		
+		do {
+			numEdges = rand() % 4;
+		} while (numEdges == 0);
+		
+		for (int j = 0; j < numEdges; j++) {
+			Node destNode;
+			do {
+				destIndex = rand() % graph->getNumVertex();
+				destNode = graph->getVertexSet().at(destIndex)->getInfo();
+			} while (startNode == destNode || startNode.findEdge(destNode) != NULL);
+			
+			graph->addEdge(startNode, destNode, startNode.calcDist(destNode));
+		}
+	}
+}
+
+void Project::generateRandomTraffic() {
+	int numVehicles, startIndex, destIndex;
+
+	numVehicles = rand() % 10;
+	for (int i = 0; i < numVehicles; i++) {
+		startIndex = rand() % graph->getNumVertex();
+		do {
+			destIndex = rand() % graph->getNumVertex();
+		} while (startIndex == destIndex);
+
+		Node startNode = graph->findVertexByIndex(startIndex)->getInfo();
+		Node destNode = graph->findVertexByIndex(destIndex)->getInfo();
+		
+		traffic.push(new Vehicle(startNode, destNode));
 	}
 }
 
@@ -79,7 +139,7 @@ void Project::readEdgesFile() {
 
 	ifstream edgesFile;
 	string line;
-	int semicolon1, semicolon2, idEdge, idStart, idEnd;
+	int semicolon1, semicolon2, idEdge, idStart, idDest;
 
 	edgesFile.open(EDGES_FILE);
 
@@ -89,12 +149,12 @@ void Project::readEdgesFile() {
 
 		idEdge = stoi(line.substr(0, semicolon1));
 		idStart = stoi(line.substr(semicolon1 + 1, semicolon2));
-		idEnd = stoi(line.substr(semicolon2 + 1));
+		idDest = stoi(line.substr(semicolon2 + 1));
 
 		Node startNode = getVertexByNodeId(idStart)->getInfo();
-		Node endNode = getVertexByNodeId(idEnd)->getInfo();
+		Node destNode = getVertexByNodeId(idDest)->getInfo();
 
-		graph->addEdge(startNode, endNode, startNode.calcDist(endNode));
+		graph->addEdge(startNode, destNode, startNode.calcDist(destNode));
 	}
 
 	edgesFile.close();
@@ -102,33 +162,25 @@ void Project::readEdgesFile() {
 
 void Project::readTrafficFile() {
 
+	ifstream trafficFile;
+	string line;
+	int semicolon1, semicolon2, idVehicle, idStart, idDest;
 
-}
+	trafficFile.open(TRAFFIC_FILE);
 
-void Project::reportAccident() {
+	while (getline(trafficFile, line)) {
+		semicolon1 = line.find_first_of(';');
+		semicolon2 = line.find_last_of(';');
 
-	int id;
-	Edge<Node>* e = NULL;
+		idVehicle = stoi(line.substr(0, semicolon1));
+		idStart = stoi(line.substr(semicolon1 + 1, semicolon2));
+		idDest = stoi(line.substr(semicolon2 + 1));
 
-	cout << ". To leave insert 0!" << endl;
-	do {
-		cout << "-> Insert occurrence's location (edge id): ";
-		cin >> id;
-		cin.ignore();
+		Node startNode = getVertexByNodeId(idStart)->getInfo();
+		Node destNode = getVertexByNodeId(idDest)->getInfo();
 
-		e = graph->findEdgeById(id);
-		if (e == NULL)
-			cout << ". Edge inserted does not exist!";			
-		cout << endl;
-		
-	} while (e == NULL && id != 0);
-
-	if (graph->removeEdge(e)) {
-		gv->setEdgeThickness(e->getId(), 3);
-		gv->setEdgeColor(e->getId(), RED);
-		printGv();
+		traffic.push(new Vehicle(startNode, destNode));
 	}
-	else cout << ". Could not remove edge!";
 }
 
 void Project::loadNodesGv() {
@@ -157,6 +209,61 @@ Vertex<Node>* Project::getVertexByNodeId(int idNode) {
 	return NULL;
 }
 
+vector<Edge<Node>*> Project::getDijkstraPath(Node dest) {
+	vector<Edge<Node>*> fullPath;
+
+	Vertex<Node>* v = graph->findVertex(dest);
+	while (v->getPath() != NULL) {
+		fullPath.push_back(v->getPath());
+		v = v->getPath()->getSrc();
+	}
+
+	return fullPath;
+}
+
+void Project::printPath(vector<Edge<Node>*> path) {
+	ostringstream pathStr;
+
+	if (path.size() == 0) {
+		pathStr << "No path available!";
+	}
+	else {
+		for (size_t i = path.size() - 1;; i--) {
+			Edge<Node>* edge = path.at(i);
+
+			// paint path edges on the Gv
+			gv->setEdgeThickness(path.at(i)->getId(), 3);
+			gv->setEdgeColor(path.at(i)->getId(), YELLOW);
+
+			// paint path nodes on the Gv and on the CLI
+			pathStr << edge->getSrc()->getInfo().getId() << "->";
+			if (i != 0) {
+				if (i == path.size() - 1)
+					gv->setVertexColor(edge->getSrc()->getInfo().getId(), RED);
+			}
+			else {
+				gv->setVertexColor(edge->getDest()->getInfo().getId(), GREEN);
+				pathStr << edge->getDest()->getInfo().getId();
+				break;
+			}
+		}
+	}
+
+	printGv();
+	cout << pathStr.str() << endl;
+}
+
+void Project::printAllPaths() {
+	for (Vertex<Node>* vertex : graph->getVertexSet()) {
+		vector<Edge<Node>*> path = getDijkstraPath(vertex->getInfo());
+		if (path.size() > 0) {
+			cout << "to Vertex " << vertex->getInfo().getId() << ": ";
+			printPath(path);
+		}
+	}
+	cout << endl;
+}
+
 void Project::testDijkstra() {
 
 	char answer;
@@ -171,7 +278,7 @@ void Project::testDijkstra() {
 		cout << "-> Insert vertex of start: ";
 		cin >> idStart;
 		cin.ignore();
-		
+
 		if (idStart > 0 && idStart < graph->getNumVertex())
 			validIndex = true;
 		else
@@ -206,10 +313,10 @@ void Project::testDijkstra() {
 		} while (!validIndex);
 
 		Node dest = getVertexByNodeId(idDest)->getInfo();
-		
+
 		vector<Edge<Node>*> path = getDijkstraPath(dest);
 		if (path.size() > 0) {
-			cout << "\nPath from vertex " << start.getId()
+			cout << "\n. Path from vertex " << start.getId()
 				<< " to vertex " << dest.getId() << ": ";
 			this->printPath(path);
 		}
@@ -218,7 +325,7 @@ void Project::testDijkstra() {
 		cout << endl;
 	}
 	else {
-		cout << "\nAvailable paths from Vertex " << start.getId() << ":\n";
+		cout << "\n. Available paths from Vertex " << start.getId() << ":\n";
 		this->printAllPaths();
 	}
 
@@ -226,61 +333,70 @@ void Project::testDijkstra() {
 	updateGv();
 }
 
-vector<Edge<Node>*> Project::getDijkstraPath(Node dest) {
-	vector<Edge<Node>*> fullPath;
-
-	Vertex<Node>* v = graph->findVertex(dest);
-	while (v->getPath() != NULL) {
-		fullPath.push_back(v->getPath());
-		v = v->getPath()->getSrc();
-	}
-
-	return fullPath;
-}
-
 void Project::testAstar() {
 
 }
 
-void Project::printPath(vector<Edge<Node>*> path) {
-	ostringstream pathStr;
+void Project::divertTraffic() {
 
-	if (path.size() == 0) {
-		pathStr << "No path available!";
-		return;
-	}
+	int numVehicles = traffic.size();
+	double totalDijkstraTime = 0;
+	Vehicle* v = NULL;
+	
+	if (!traffic.empty()) {
+		cout << ". Processing traffic ..." << endl;
 
-	for (size_t i = path.size() - 1;; i--) {
-		Edge<Node>* edge = path.at(i);
+		while (!traffic.empty()) {
 
-		// paint path edges on the Gv
-		gv->setEdgeThickness(path.at(i)->getId(), 3);
-		gv->setEdgeColor(path.at(i)->getId(), YELLOW);
+			v = traffic.front();
+			traffic.pop();
+			
+			auto start = chrono::high_resolution_clock::now();
+			graph->dijkstraShortestPath(v->getStartNode());
+			auto finish = chrono::high_resolution_clock::now();
+			totalDijkstraTime += chrono::duration_cast<chrono::microseconds>(finish - start).count();
+			
+			vector<Edge<Node>*> path = getDijkstraPath(v->getDestNode());
+			cout << ". Path for vehicle " << v->getId() << ": ";
+			printPath(path);
+			Sleep(2000);
 
-		// paint path nodes on the Gv and on the CLI
-		pathStr << edge->getSrc()->getInfo().getId() << "->";
-		if (i != 0) {
-			if (i == path.size() - 1)
-				gv->setVertexColor(edge->getSrc()->getInfo().getId(), RED);
+			resetGv();
+			updateGv();
+			graph->randomizeNumVehicles();
 		}
-		else {
-			gv->setVertexColor(edge->getDest()->getInfo().getId(), GREEN);
-			pathStr << edge->getDest()->getInfo().getId();
-			break;
-		}
-	}
 
-	printGv();
-	cout << pathStr.str() << endl;
+		cout << ". Dijkstra processing average time (micro-seconds) = "
+			<< (totalDijkstraTime / (graph->getNumVertex())) << endl;
+	} 
+	else cout << ". No traffic to be processed!\n";
+	cout << endl;
 }
 
-void Project::printAllPaths() {
-	for (Vertex<Node>* vertex : graph->getVertexSet()) {
-		vector<Edge<Node>*> path = getDijkstraPath(vertex->getInfo());
-		if (path.size() > 0) {
-			cout << "to Vertex " << vertex->getInfo().getId() << ": ";
-			printPath(path);
+void Project::reportAccident() {
+
+	int id;
+	Edge<Node>* e = NULL;
+
+	cout << ". To leave insert 0!" << endl;
+	do {
+		cout << "-> Insert occurrence's location (edge id): ";
+		cin >> id;
+		cin.ignore();
+
+		e = graph->findEdgeById(id);
+		if (id != 0) {
+			if (e == NULL)
+				cout << ". Edge inserted does not exist!\n";
+			else
+				if (graph->removeEdge(e)) {
+					gv->setEdgeThickness(e->getId(), 3);
+					gv->setEdgeColor(e->getId(), RED);
+					printGv();
+				}
+				else cout << ". Could not remove edge!\n";
 		}
-	}
+	} while (id != 0);
+
 	cout << endl;
 }

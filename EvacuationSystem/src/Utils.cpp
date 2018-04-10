@@ -3,13 +3,9 @@
 Project* initProj() {
 
 	cout << "EvacuationSystem - CAL 1718\n";
-	cout << ". Loading graph files ...";
-
 	Project *proj = new Project();
-	proj->readNodesFile();
-	proj->readEdgesFile();
-	proj->readTrafficFile();
-	
+	graphSelectionMenu(proj);
+
 	proj->openWindowGv();
 	proj->loadNodesGv();
 	proj->loadEdgesGv();
@@ -22,6 +18,44 @@ Project* initProj() {
 	return proj;
 }
 
+void graphSelectionMenu(Project * proj) {
+
+	vector<string> menuOptions = {
+		"-> 1. Load graph from files",
+		"-> 2. Generate random graph",
+		"-> 0. Leave",
+	};
+
+	for (string option : menuOptions)
+		cout << option << endl;
+
+	int option = processInput(0, 2);
+	cout << endl;
+
+	switch (option) {
+
+	case 1:
+	{
+		cout << ". Loading graph files ...\n";
+		auto start = chrono::high_resolution_clock::now();
+		proj->readNodesFile();
+		proj->readEdgesFile();
+		proj->readTrafficFile();
+		auto finish = chrono::high_resolution_clock::now();
+
+		auto elapsed = chrono::duration_cast<chrono::microseconds>(finish - start).count();
+		cout << ". Files reading time (micro-seconds) = " << elapsed << endl;
+
+		Sleep(3000);
+		break;
+	}
+	case 2:
+		proj->generateRandomGraph();
+		proj->generateRandomTraffic();
+		break;
+	}
+}
+
 void mainMenu(Project* proj) {
 
 	while (int option = optionsMenu()) {
@@ -32,6 +66,9 @@ void mainMenu(Project* proj) {
 			menuPaths(proj);
 			break;
 		case 2:
+			proj->divertTraffic();
+			break;
+		case 3:
 			proj->reportAccident();
 			break;
 		default:
@@ -44,15 +81,16 @@ int optionsMenu() {
 
 	cout << "EvacuationSystem - main menu:\n";
 	vector<string> menuOptions = {
-		"-> 1. Calculate shortest paths",
-		"-> 2. Report accident",
+		"-> 1. Calculate shortest routes",
+		"-> 2. Divert current traffic",
+		"-> 3. Report accidents",
 		"-> 0. Leave",
 	};
 
 	for (string option : menuOptions)
 		cout << option << endl;
 	
-	int option = processInput(0,2);
+	int option = processInput(0,3);
 	cout << endl;
 
 	return option;
@@ -100,7 +138,7 @@ int processInput(int inf, int sup) {
 	bool validOption;
 	do {
 		validOption = false;
-		cout << "Option: ";
+		cout << ". Option: ";
 		cin >> option;
 		cin.ignore();
 		if (option >= inf && option <= sup)
@@ -109,16 +147,3 @@ int processInput(int inf, int sup) {
 
 	return option;
 }
-
-//void Project::test_performance_dijkstra() {
-//	cout << "Dijkstra processing graph ..." << endl;
-//
-//	auto start = std::chrono::high_resolution_clock::now();
-//	for (Vertex<Node> *vertex : graph->getVertexSet())
-//		graph->dijkstraShortestPath(vertex->getInfo());
-//	auto finish = std::chrono::high_resolution_clock::now();
-//
-//	auto elapsed = std::chrono::duration_cast<chrono::microseconds>(finish - start).count();
-//	cout << "Dijkstra processing average time (micro-seconds) = "
-//		<< (elapsed / (GRAPH_WIDTH * GRAPH_HEIGHT)) << endl;
-//}

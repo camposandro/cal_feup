@@ -177,8 +177,10 @@ public:
 	int maxNewChildren(const T &source, T &inf) const;
 	bool isDAG() const;
 
+	Vertex<T>* findVertexByIndex(int idx) const;
 	Vertex<T>* findVertex(const T &in) const;
 	Edge<T>* findEdgeById(int idx) const;
+
 	void randomizeNumVehicles();
 	void dijkstraShortestPath(const T &s);
 };
@@ -212,6 +214,11 @@ bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
 }
 
 template <class T>
+Vertex<T>* Graph<T>::findVertexByIndex(int idx) const {
+	return vertexSet.at(idx);
+}
+
+template <class T>
 Vertex<T> * Graph<T>::findVertex(const T &in) const {
 	for (auto v : vertexSet)
 		if (v->info == in)
@@ -232,8 +239,16 @@ template<class T>
 void Graph<T>::randomizeNumVehicles() {
 	for (Vertex<T>* v : vertexSet)
 		for (Edge<T>* e : v->getAdj())
-			if (e->currentNumVehicles != e->maxNumVehicles)
-				e->currentNumVehicles += rand() % (e->maxNumVehicles - e->currentNumVehicles);
+			if (e->currentNumVehicles != e->maxNumVehicles) {
+				int numNewVehicles = rand() % (e->maxNumVehicles - e->currentNumVehicles);
+				if (rand() % 100 > 30)
+					e->currentNumVehicles += numNewVehicles;
+				else {
+					e->currentNumVehicles -= numNewVehicles;
+					if (e->currentNumVehicles < 0) 
+						e->currentNumVehicles = 0;
+				}
+			}
 }
 
 template <class T>

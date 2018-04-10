@@ -8,6 +8,7 @@
 #include "Project.h"
 
 Project* initProj();
+void graphSelectionMenu(Project * proj);
 void mainMenu(Project* proj);
 int optionsMenu();
 void menuPaths(Project* proj);
