@@ -5,8 +5,8 @@
 
 int main() {
 
-	Project* proj = initProj();
-	mainMenu(proj);
+	Project* proj = new Project();
+	graphSelectionMenu(proj);
 	
 	return 0;
 }

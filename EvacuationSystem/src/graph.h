@@ -28,10 +28,10 @@ class Vertex {
 	bool removeEdgeTo(Vertex<T> *d);
 public:
 	Vertex(T in);
-	T getInfo();
-	vector<Edge<T>*> getAdj();
-	Edge<T>* getPath();
-	double getDist();
+	T getInfo() const;
+	vector<Edge<T>*> getAdj() const;
+	Edge<T>* getPath() const;
+	double getDist() const;
 	bool operator== (const Vertex<T> &v);
 	friend class Graph<T>;
 };
@@ -40,22 +40,22 @@ template <class T>
 Vertex<T>::Vertex(T in) : info(in) {}
 
 template <class T>
-T Vertex<T>::getInfo() {
+T Vertex<T>::getInfo() const {
 	return info;
 }
 
 template <class T>
-vector<Edge<T>*> Vertex<T>::getAdj() {
+vector<Edge<T>*> Vertex<T>::getAdj() const {
 	return adj;
 }
 
 template <class T>
-Edge<T>* Vertex<T>::getPath() {
+Edge<T>* Vertex<T>::getPath() const {
 	return path;
 }
 
 template <class T>
-double Vertex<T>::getDist() {
+double Vertex<T>::getDist() const {
 	return dist;
 }
 
@@ -98,12 +98,13 @@ class Edge {
 	int currentNumVehicles;
 public:
 	Edge(Vertex<T> *s, Vertex<T> *d, double w);
-	int getId();
-	Vertex<T>* getSrc();
-	Vertex<T>* getDest();
-	double getWeight();
-	int getMaxNumVehicles();
-	int getCurrentNumVehicles();
+	int getId() const;
+	Vertex<T>* getSrc() const;
+	Vertex<T>* getDest() const;
+	double getWeight() const;
+	int getMaxNumVehicles() const;
+	int getCurrentNumVehicles() const;
+	void resetEdgeId();
 	bool operator== (const Edge<T> edge);
 	friend class Graph<T>;
 	friend class Vertex<T>;
@@ -122,33 +123,38 @@ Edge<T>::Edge(Vertex<T> *s, Vertex<T> *d, double w) : id(edgeId++) {
 }
 
 template <class T>
-int Edge<T>::getId() {
+int Edge<T>::getId() const {
 	return id;
 }
 
 template <class T>
-Vertex<T>* Edge<T>::getSrc() {
+Vertex<T>* Edge<T>::getSrc() const {
 	return src;
 }
 
 template <class T>
-Vertex<T>* Edge<T>::getDest() {
+Vertex<T>* Edge<T>::getDest() const {
 	return dest;
 }
 
 template <class T>
-double Edge<T>::getWeight() {
+double Edge<T>::getWeight() const {
 	return weight;
 }
 
 template<class T>
-int Edge<T>::getMaxNumVehicles() {
+int Edge<T>::getMaxNumVehicles() const {
 	return maxNumVehicles;
 }
 
 template<class T>
-int Edge<T>::getCurrentNumVehicles() {
+int Edge<T>::getCurrentNumVehicles() const {
 	return currentNumVehicles;
+}
+
+template<class T>
+void Edge<T>::resetEdgeId() {
+	edgeId = 1;
 }
 
 template <class T>
@@ -161,21 +167,14 @@ template <class T>
 class Graph {
 	vector<Vertex<T>*> vertexSet;   
 
-	void dfsVisit(Vertex<T> *v, vector<T> & res) const;
-	bool dfsIsDAG(Vertex<T> *v) const;
 public:
-	vector<Vertex<T> *> getVertexSet();
+	vector<Vertex<T> *> getVertexSet() const;
 	int getNumVertex() const;
 	bool addVertex(const T &in);
 	bool removeVertex(const T &in);
 	bool addEdge(const T &sourc, const T &dest, double w);
 	bool removeEdge(Edge<T>* e);
 	bool removeEdge(const T &sourc, const T &dest);
-	vector<T> dfs() const;
-	vector<T> bfs(const T &source) const;
-	vector<T> topsort() const;
-	int maxNewChildren(const T &source, T &inf) const;
-	bool isDAG() const;
 
 	Vertex<T>* findVertexByIndex(int idx) const;
 	Vertex<T>* findVertex(const T &in) const;
@@ -186,7 +185,7 @@ public:
 };
 
 template<class T>
-vector<Vertex<T>*> Graph<T>::getVertexSet() {
+vector<Vertex<T>*> Graph<T>::getVertexSet() const {
 	return vertexSet;
 }
 
@@ -237,10 +236,11 @@ Edge<T> * Graph<T>::findEdgeById(int idx) const {
 
 template<class T>
 void Graph<T>::randomizeNumVehicles() {
+	int numNewVehicles;
 	for (Vertex<T>* v : vertexSet)
 		for (Edge<T>* e : v->getAdj())
 			if (e->currentNumVehicles != e->maxNumVehicles) {
-				int numNewVehicles = rand() % (e->maxNumVehicles - e->currentNumVehicles);
+				numNewVehicles = rand() % (e->maxNumVehicles - e->currentNumVehicles);
 				if (rand() % 100 > 30)
 					e->currentNumVehicles += numNewVehicles;
 				else {
@@ -279,196 +279,44 @@ bool Graph<T>::removeVertex(const T &in) {
 	return false;
 }
 
-template <class T>
-vector<T> Graph<T>::dfs() const {
-	vector<T> res;
-	for (auto v : vertexSet)
-		v->visited = false;
-	for (auto v : vertexSet)
-		if (!v->visited)
-			dfsVisit(v, res);
-	return res;
-}
-
-template <class T>
-void Graph<T>::dfsVisit(Vertex<T> *v, vector<T> & res) const {
-	v->visited = true;
-	res.push_back(v->info);
-	for (auto & e : v->adj) {
-		auto w = e.dest;
-		if (!w->visited)
-			dfsVisit(w, res);
-	}
-}
-
-template <class T>
-vector<T> Graph<T>::bfs(const T & source) const {
-	vector<T> res;
-	auto s = findVertex(source);
-	if (s == NULL)
-		return res;
-	queue<Vertex<T> *> q;
-	for (auto v : vertexSet)
-		v->visited = false;
-	q.push(s);
-	s->visited = true;
-	while (!q.empty()) {
-		auto v = q.front();
-		q.pop();
-		res.push_back(v->info);
-		for (auto & e : v->adj) {
-			auto w = e.dest;
-			if (!w->visited) {
-				q.push(w);
-				w->visited = true;
-			}
-		}
-	}
-	return res;
-}
-
-template<class T>
-vector<T> Graph<T>::topsort() const {
-	vector<T> res;
-
-	for (auto v : vertexSet)
-		v->indegree = 0;
-	for (auto v : vertexSet)
-		for (auto & e : v->adj)
-			e.dest->indegree++;
-
-	queue<Vertex<T>*> q;
-	for (auto v : vertexSet)
-		if (v->indegree == 0)
-			q.push(v);
-
-	while (!q.empty()) {
-		Vertex<T>* v = q.front();
-		q.pop();
-		res.push_back(v->info);
-		for (auto & e : v->adj) {
-			auto w = e.dest;
-			w->indegree--;
-			if (w->indegree == 0)
-				q.push(w);
-		}
-	}
-
-	if (res.size() != vertexSet.size()) {
-		cout << "Ordenacao Impossivel!" << endl;
-		res.clear();
-		return res;
-	}
-
-	return res;
-}
-
-template <class T>
-int Graph<T>::maxNewChildren(const T & source, T &inf) const {
-	auto s = findVertex(source);
-	if (s == NULL)
-		return 0;
-	queue<Vertex<T> *> q;
-	int maxChildren = 0;
-	inf = s->info;
-	for (auto v : vertexSet)
-		v->visited = false;
-	q.push(s);
-	s->visited = true;
-	while (!q.empty()) {
-		auto v = q.front();
-		q.pop();
-		int nChildren = 0;
-		for (auto & e : v->adj) {
-			auto w = e.dest;
-			if (!w->visited) {
-				w->visited = true;
-				q.push(w);
-				nChildren++;
-			}
-		}
-		if (nChildren>maxChildren) {
-			maxChildren = nChildren;
-			inf = v->info;
-		}
-	}
-	return maxChildren;
-}
-
-
-template <class T>
-bool Graph<T>::isDAG() const {
-	for (auto v : vertexSet) {
-		v->visited = false;
-		v->processing = false;
-	}
-	for (auto v : vertexSet)
-		if (!v->visited)
-			if (!dfsIsDAG(v))
-				return false;
-	return true;
-}
-
-template <class T>
-bool Graph<T>::dfsIsDAG(Vertex<T> *v) const {
-	v->visited = true;
-	v->processing = true;
-	for (auto & e : v->adj) {
-		auto w = e.dest;
-		if (w->processing)
-			return false;
-		if (!w->visited)
-			if (!dfsIsDAG(w))
-				return false;
-	}
-	v->processing = false;
-	return true;
-}
-
 template<class T>
 void Graph<T>::dijkstraShortestPath(const T & s) {
 	vector<Vertex<T>*> p_queue;
 
-	// initializing all vertices
 	for (Vertex<T> *v : vertexSet) {
 		v->dist = INF;
 		v->path = NULL;
 		v->processing = false;
 	}
 	
-	// get initial vertex
 	Vertex<T> *v = findVertex(s);
-	// set its distance to 0
 	v->dist = 0;
 	p_queue.push_back(v);
 
 	make_heap(p_queue.begin(), p_queue.end());
-
+	
 	while (!p_queue.empty()) {
+
 		Vertex<T> *v = p_queue.back();
 
 		p_queue.pop_back();
-		// pop vertex of minimum distance out of the heap
 		pop_heap(p_queue.begin(), p_queue.end());
 		
 		for (Edge<T>* e : v->adj) {
 			Vertex<T> *w = e->dest;
 			if (e->currentNumVehicles < e->maxNumVehicles && w->dist > v->dist + e->weight) {
+
 				e->currentNumVehicles++;
 				w->dist = v->dist + e->weight;
 				w->path = e;
 				
-				// if vertex is not in p_queue, insert it
 				if (!w->processing) {
 					w->processing = true;
 					p_queue.push_back(w);
 				}
-				
-				// reorganize p_queue - vertex of lower distance in the back
+
 				make_heap(p_queue.begin(), p_queue.end(), vertexPointerGreatherThan<T>());
 			}
 		}
 	}
 }
-
-/* ------------------------------------------------------- */

@@ -11,8 +11,8 @@ private:
 public:
 	Point();
 	Point(int x, int y);
-	int getX();
-	int getY();
+	int getX() const;
+	int getY() const;
 	void setX(int x);
 	void setY(int y);
 	bool operator== (const Point &point);
@@ -30,13 +30,14 @@ private:
 public:
 	Node();
 	Node(int x, int y);
-	int getId();
-	Point getCoords();
-	std::vector<Edge<Node>*> getAdj();
+	int getId() const;
+	Point getCoords() const;
+	std::vector<Edge<Node>*> getAdj() const;
 	void setId(int id);
 	void setCoords(Point coords);
 	void setAdj(std::vector<Edge<Node>*> adj);
 	double calcDist(Node n);
 	Edge<Node>* findEdge(Node n);
+	void resetNodeId();
 	bool operator== (const Node &node);
 };
