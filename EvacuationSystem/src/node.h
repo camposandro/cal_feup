@@ -3,7 +3,6 @@
 #include <vector>
 #include "Graph.h"
 
-/* ------------------ Point Class ------------------- */
 class Point {
 
 private:
@@ -19,22 +18,24 @@ public:
 	bool operator== (const Point &point);
 };
 
-/* ------------------ Node Class ------------------- */
 class Node {
-
+	
 private:
+	static int nodeId;
 	int id;
 	Point coords;
-	std::vector<Edge<int>> adj;
+	std::vector<Edge<Node>*> adj;
 
 public:
 	Node();
-	Node(int id, int x, int y);
+	Node(int x, int y);
 	int getId();
 	Point getCoords();
-	std::vector<Edge<int>> getAdj();
+	std::vector<Edge<Node>*> getAdj();
 	void setId(int id);
 	void setCoords(Point coords);
-	void setAdj(std::vector<Edge<int>> adj);
+	void setAdj(std::vector<Edge<Node>*> adj);
+	double calcDist(Node n);
+	Edge<Node>* findEdge(Node n);
 	bool operator== (const Node &node);
 };

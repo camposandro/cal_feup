@@ -2,10 +2,13 @@
 
 #include <vector>
 #include <sstream>
-
+#include <random>
+#include <time.h>
+#include <chrono>
 #include "Project.h"
 
 Project* initProj();
+void graphSelectionMenu(Project * proj);
 void mainMenu(Project* proj);
 int optionsMenu();
 void menuPaths(Project* proj);

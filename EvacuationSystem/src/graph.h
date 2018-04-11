@@ -3,6 +3,7 @@
 #include <vector>
 #include <queue>
 #include <list>
+#include <iostream>
 #include <limits>
 #include <cmath>
 using namespace std;
@@ -10,30 +11,32 @@ using namespace std;
 template <class T> class Edge;
 template <class T> class Graph;
 template <class T> class Vertex;
+class Node;
 
 #define INF std::numeric_limits<double>::max()
 
-/* -------------------- Vertex Class ------------------------- */
 template <class T>
 class Vertex {
-	T info;                // contents
-	vector<Edge<T> > adj;  // list of outgoing edges
-	bool visited;          // auxiliary field used by dfs and bfs
-	bool processing;       // auxiliary field used by isDAG
-	int indegree;          // auxiliary field used by topsort
+	T info;                
+	vector<Edge<T>*> adj;  
+	bool visited;         
+	bool processing;      
+	int indegree;          
 
-	Vertex<T> *path;		// path to last vertex of the path
-	double dist;			// distance to the last vertex of the path
+	Edge<T>* path;		
+	double dist;
+	double gCost;
+	double fCost;
 
 	void addEdge(Vertex<T> *dest, double w);
 	bool removeEdgeTo(Vertex<T> *d);
 public:
 	Vertex(T in);
-	int queueIndex = 0;		// required by MutablePriorityQueue
 	T getInfo();
-	vector<Edge<T>> getAdj();
-	Vertex<T>* getPath();
+	vector<Edge<T>*> getAdj();
+	Edge<T>* getPath();
 	double getDist();
+	double getFCost();
 	bool operator== (const Vertex<T> &v);
 	friend class Graph<T>;
 };
@@ -47,12 +50,12 @@ T Vertex<T>::getInfo() {
 }
 
 template <class T>
-vector<Edge<T>> Vertex<T>::getAdj() {
+vector<Edge<T>*> Vertex<T>::getAdj() {
 	return adj;
 }
 
 template <class T>
-Vertex<T>* Vertex<T>::getPath() {
+Edge<T>* Vertex<T>::getPath() {
 	return path;
 }
 
@@ -62,14 +65,19 @@ double Vertex<T>::getDist() {
 }
 
 template <class T>
+double Vertex<T>::getFCost() {
+	return fCost;
+}
+
+template <class T>
 void Vertex<T>::addEdge(Vertex<T> *d, double w) {
-	adj.push_back(Edge<T>(d, w));
+	adj.push_back(new Edge<T>(this, d, w));
 }
 
 template <class T>
 bool Vertex<T>::removeEdgeTo(Vertex<T> *d) {
 	for (auto it = adj.begin(); it != adj.end(); it++)
-		if (it->dest == d) {
+		if ((*it)->dest == d) {
 			adj.erase(it);
 			return true;
 		}
@@ -82,30 +90,63 @@ bool Vertex<T>::operator== (const Vertex<T> &v) {
 }
 
 template <class T>
+struct fCostGreaterThan {
+	bool operator()(Vertex<T>* v1, Vertex<T>* v2) {
+		return v1->getFCost() > v2->getFCost();
+	}
+};
+
+template <class T>
 struct vertexPointerGreatherThan {
 	bool operator()(Vertex<T>* v1, Vertex<T>* v2) {
 		return v1->getDist() > v2->getDist();
 	}
 };
 
-/* --------------------------------------------------------- */
 
-/* -------------------- Edge Class ------------------------- */
 template <class T>
 class Edge {
-	Vertex<T> * dest;      // destination vertex
-	double weight;         // edge weight
+	static int edgeId;
+	int id;
+	Vertex<T> *src;
+	Vertex<T> *dest;      
+	double weight;
+	int maxNumVehicles;
+	int currentNumVehicles;
 public:
-	Edge(Vertex<T> *d, double w);
+	Edge(Vertex<T> *s, Vertex<T> *d, double w);
+	int getId();
+	Vertex<T>* getSrc();
 	Vertex<T>* getDest();
 	double getWeight();
+	int getMaxNumVehicles();
+	int getCurrentNumVehicles();
 	bool operator== (const Edge<T> edge);
 	friend class Graph<T>;
 	friend class Vertex<T>;
 };
 
 template <class T>
-Edge<T>::Edge(Vertex<T> *d, double w) : dest(d), weight(w) {}
+int Edge<T>::edgeId = 1;
+
+template <class T>
+Edge<T>::Edge(Vertex<T> *s, Vertex<T> *d, double w) : id(edgeId++) {
+	this->src = s;
+	this->dest = d;
+	this->weight = w;
+	this->maxNumVehicles = (int) weight;
+	this->currentNumVehicles = rand() % maxNumVehicles;
+}
+
+template <class T>
+int Edge<T>::getId() {
+	return id;
+}
+
+template <class T>
+Vertex<T>* Edge<T>::getSrc() {
+	return src;
+}
 
 template <class T>
 Vertex<T>* Edge<T>::getDest() {
@@ -117,17 +158,24 @@ double Edge<T>::getWeight() {
 	return weight;
 }
 
+template<class T>
+int Edge<T>::getMaxNumVehicles() {
+	return maxNumVehicles;
+}
+
+template<class T>
+int Edge<T>::getCurrentNumVehicles() {
+	return currentNumVehicles;
+}
+
 template <class T>
 bool Edge<T>::operator== (const Edge<T> edge) {
 	return dest->getInfo() == edge.dest->getInfo() && weight == edge.weight;
 }
 
-/* ---------------------------------------------------------- */
-
-/* -------------------- Graph Class ------------------------- */
 template <class T>
 class Graph {
-	vector<Vertex<T> *> vertexSet;    // vertex set
+	vector<Vertex<T>*> vertexSet;   
 
 	void dfsVisit(Vertex<T> *v, vector<T> & res) const;
 	bool dfsIsDAG(Vertex<T> *v) const;
@@ -137,6 +185,7 @@ public:
 	bool addVertex(const T &in);
 	bool removeVertex(const T &in);
 	bool addEdge(const T &sourc, const T &dest, double w);
+	bool removeEdge(Edge<T>* e);
 	bool removeEdge(const T &sourc, const T &dest);
 	vector<T> dfs() const;
 	vector<T> bfs(const T &source) const;
@@ -144,14 +193,17 @@ public:
 	int maxNewChildren(const T &source, T &inf) const;
 	bool isDAG() const;
 
-	Vertex<T> *findVertex(const T &in) const;
+	Vertex<T>* findVertexByIndex(int idx) const;
+	Vertex<T>* findVertex(const T &in) const;
+	Edge<T>* findEdgeById(int idx) const;
+
+	void randomizeNumVehicles();
 	void dijkstraShortestPath(const T &s);
 	void AstarShortestPath(const T &s, const T &e);
 };
 
 template<class T>
-vector<Vertex<T>*> Graph<T>::getVertexSet()
-{
+vector<Vertex<T>*> Graph<T>::getVertexSet() {
 	return vertexSet;
 }
 
@@ -179,11 +231,46 @@ bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
 }
 
 template <class T>
+Vertex<T>* Graph<T>::findVertexByIndex(int idx) const {
+	return vertexSet.at(idx);
+}
+
+template <class T>
 Vertex<T> * Graph<T>::findVertex(const T &in) const {
 	for (auto v : vertexSet)
 		if (v->info == in)
 			return v;
 	return NULL;
+}
+
+template <class T>
+Edge<T> * Graph<T>::findEdgeById(int idx) const {
+	for (Vertex<T>* v : vertexSet)
+		for (Edge<T>* e : v->adj)
+			if (e->id == idx)
+				return e;
+	return NULL;
+}
+
+template<class T>
+void Graph<T>::randomizeNumVehicles() {
+	for (Vertex<T>* v : vertexSet)
+		for (Edge<T>* e : v->getAdj())
+			if (e->currentNumVehicles != e->maxNumVehicles) {
+				int numNewVehicles = rand() % (e->maxNumVehicles - e->currentNumVehicles);
+				if (rand() % 100 > 30)
+					e->currentNumVehicles += numNewVehicles;
+				else {
+					e->currentNumVehicles -= numNewVehicles;
+					if (e->currentNumVehicles < 0) 
+						e->currentNumVehicles = 0;
+				}
+			}
+}
+
+template <class T>
+bool Graph<T>::removeEdge(Edge<T>* e) {
+	return removeEdge(e->src->info, e->dest->info);
 }
 
 template <class T>
@@ -356,8 +443,7 @@ bool Graph<T>::dfsIsDAG(Vertex<T> *v) const {
 }
 
 template<class T>
-void Graph<T>::dijkstraShortestPath(const T & s)
-{
+void Graph<T>::dijkstraShortestPath(const T & s) {
 	vector<Vertex<T>*> p_queue;
 
 	// initializing all vertices
@@ -376,17 +462,18 @@ void Graph<T>::dijkstraShortestPath(const T & s)
 	make_heap(p_queue.begin(), p_queue.end());
 
 	while (!p_queue.empty()) {
-		Vertex<T> *v = p_queue.front();
+		Vertex<T> *v = p_queue.back();
 
 		p_queue.pop_back();
 		// pop vertex of minimum distance out of the heap
 		pop_heap(p_queue.begin(), p_queue.end());
-
-		for (Edge<T> e : v->adj) {
-			Vertex<T> *w = e.dest;
-			if (w->dist > v->dist + e.weight) {
-				w->dist = v->dist + e.weight;
-				w->path = v;
+		
+		for (Edge<T>* e : v->adj) {
+			Vertex<T> *w = e->dest;
+			if (e->currentNumVehicles < e->maxNumVehicles && w->dist > v->dist + e->weight) {
+				e->currentNumVehicles++;
+				w->dist = v->dist + e->weight;
+				w->path = e;
 				
 				// if vertex is not in p_queue, insert it
 				if (!w->processing) {
@@ -400,54 +487,3 @@ void Graph<T>::dijkstraShortestPath(const T & s)
 		}
 	}
 }
-
-template<class T>
-void Graph<T>::AstarShortestPath(const T & s, const T & f){
-
-	vector<Vertex<T>*> open_list;
-	vector<Vertex<T>*> closed_list;
-
-	for (Vertex<T>* v: vertexSet) {
-			v->dist = INF;
-			v->path = NULL;
-			v->processing = true;
-			open_list.push_back(v);
-	}
-
-	Vertex<T> *v = findVertex(s);
-	v->dist = 0;
-
-	make_heap(open_list.begin(), open_list.end(), vertexPointerGreatherThan<T>());
-
-	while(!open_list.empty()){
-
-		//find the node with lower dist on the open list and pop it
-		pop_heap(open_list.begin(), open_list.end(), vertexPointerGreatherThan<T>());
-		Vertex<T>* q = open_list.back();
-
-
-		for(Edge<T> e : q->adj){
-			Vertex<T> *d = e.dest;
-
-			//if d is the target node(f)
-			if(d == f)
-				return;
-
-			if(d->processing){
-
-				if(d->dist > q->dist + e.weight){
-					d->dist = q->dist + e.weight;
-					d->path = q;
-				}
-
-			}
-
-		}
-
-		q->processing = false;
-		closed_list.push_back(q);
-	}
-
-}
-
-/* ------------------------------------------------------- */
