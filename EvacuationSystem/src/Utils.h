@@ -13,4 +13,6 @@ void mainMenu(Project* proj);
 int mainMenuOptions();
 void pathsMenu(Project* proj);
 int pathsOptions();
+void trafficMenu(Project* proj);
+int trafficOptions();
 int processInput(int inf, int sup);

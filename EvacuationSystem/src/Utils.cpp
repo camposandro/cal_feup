@@ -86,7 +86,7 @@ void mainMenu(Project* proj) {
 			pathsMenu(proj);
 			break;
 		case 2:
-			proj->divertTraffic();
+			trafficMenu(proj);
 			break;
 		case 3:
 			proj->printTraffic();
@@ -110,7 +110,7 @@ int mainMenuOptions() {
 		"-> 4. Report accidents",
 		"-> 0. Leave",
 	};
-
+	
 	for (string option : menuOptions)
 		cout << option << endl;
 	
@@ -140,8 +140,42 @@ int pathsOptions() {
 
 	cout << "EvacuationSystem - path searching:\n";
 	vector<string> pathsOptions = {
-		"-> 1. Dijkstra Algorithm",
-		"-> 2. A* Search Algorithm",
+		"-> 1. Dijkstra algorithm",
+		"-> 2. A* search algortihm",
+		"-> 0. Return",
+	};
+
+	for (string option : pathsOptions)
+		cout << option << endl;
+
+	int option = processInput(0, 2);
+	cout << endl;
+
+	return option;
+}
+
+void trafficMenu(Project* proj) {
+
+	while (int option = trafficOptions()) {
+		switch (option) {
+		case 1:
+			proj->divertTraffic("DIJKSTRA");
+			break;
+		case 2:
+			proj->divertTraffic("ASTAR");
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+int trafficOptions() {
+
+	cout << "EvacuationSystem - path searching:\n";
+	vector<string> pathsOptions = {
+		"-> 1. Dijkstra algorithm",
+		"-> 2. A* search algortihm",
 		"-> 0. Return",
 	};
 
