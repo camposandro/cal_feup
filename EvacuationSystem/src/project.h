@@ -30,8 +30,6 @@ public:
 	void setGraph(Graph<Node> *graph);
 	void setGV(GraphViewer *gv);
 	Vertex<Node>* getVertexByNodeId(int idNode);
-	vector<Edge<Node>*> getDijkstraPath(Node dest);
-	vector<Edge<Node>*> getAstarPath(Node dest);
 
 	void generateRandomGraph();
 	void generateRandomTraffic();
@@ -54,8 +52,10 @@ public:
 
 	void reportAccident();
 	void printTraffic();
-	void divertTraffic();
+	void divertTraffic(string algorithm);
 
+	vector<Edge<Node>*> getPath(Node dest);
+	bool existsPath(Node src, Node dest);
 	void printPath(vector<Edge<Node>*> path);
 	void printAllPaths();
 };

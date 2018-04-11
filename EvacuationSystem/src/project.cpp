@@ -1,4 +1,4 @@
-#include "project.h"
+#include "Project.h"
 
 Project::Project() {
 	srand((unsigned int) time(NULL));
@@ -30,29 +30,6 @@ Vertex<Node>* Project::getVertexByNodeId(int idNode) {
 	return NULL;
 }
 
-vector<Edge<Node>*> Project::getDijkstraPath(Node dest) {
-	vector<Edge<Node>*> fullPath;
-
-	Vertex<Node>* v = graph->findVertex(dest);
-	while (v->getPath() != NULL) {
-		fullPath.push_back(v->getPath());
-		v = v->getPath()->getSrc();
-	}
-	return fullPath;
-}
-
-vector<Edge<Node>*> Project::getAstarPath(Node dest) {
-	vector<Edge<Node>*> fullPath;
-
-	Vertex<Node>* v = graph->findVertex(dest);
-	while (v->getPath() != NULL) {
-		fullPath.push_back(v->getPath());
-		v = v->getPath()->getSrc();
-	}
-
-	return fullPath;
-}
-
 void Project::generateRandomGraph() {
 	int numNodes, numEdges, destIndex;
 
@@ -67,7 +44,7 @@ void Project::generateRandomGraph() {
 		Node startNode = v->getInfo();
 		
 		do {
-			numEdges = rand() % 4;
+			numEdges = rand() % 5;
 		} while (numEdges == 0);
 		
 		for (int j = 0; j < numEdges; j++) {
@@ -105,7 +82,6 @@ void Project::generateRandomTraffic() {
 }
 
 void Project::readNodesFile() {
-
 	ifstream nodesFile;
 	string line;
 	int semicolon1, semicolon2, idNode, x, y;
@@ -127,7 +103,6 @@ void Project::readNodesFile() {
 }
 
 void Project::readEdgesFile() {
-
 	ifstream edgesFile;
 	string line;
 	int semicolon1, semicolon2, idEdge, idStart, idDest;
@@ -152,7 +127,6 @@ void Project::readEdgesFile() {
 }
 
 void Project::readTrafficFile() {
-
 	ifstream trafficFile;
 	string line;
 	int semicolon1, semicolon2, idVehicle, idStart, idDest;
@@ -196,7 +170,6 @@ void Project::openWindowGv() {
 	gv->createWindow(600, 600);
 	gv->defineVertexColor("blue");
 	gv->defineEdgeColor("black");
-	//gv->defineEdgeCurved(false);
 }
 
 void Project::loadNodesGv() {
@@ -225,7 +198,6 @@ void Project::printGv() {
 void Project::updateGv() {
 	for (Vertex<Node>* vertex : graph->getVertexSet()) {
 		for (Edge<Node>* e : vertex->getAdj()) {
-
 			string label = "ID " + to_string(e->getId()) + " - " +
 				to_string(e->getCurrentNumVehicles()) +
 				" | " + to_string(e->getMaxNumVehicles());
@@ -254,7 +226,6 @@ void Project::resetGv() {
 }
 
 void Project::testDijkstra() {
-
 	char answer;
 	int idStart, idDest;
 	bool validIndex;
@@ -268,7 +239,7 @@ void Project::testDijkstra() {
 		cin >> idStart;
 		cin.ignore();
 
-		if (idStart > 0 && idStart < graph->getNumVertex())
+		if (idStart > 0 && idStart <= graph->getNumVertex())
 			validIndex = true;
 		else
 			cout << ". Insert a valid vertex index!\n";
@@ -294,7 +265,7 @@ void Project::testDijkstra() {
 			cin >> idDest;
 			cin.ignore();
 
-			if (idDest > 0 && idDest < graph->getNumVertex())
+			if (idDest > 0 && idDest <= graph->getNumVertex())
 				validIndex = true;
 			else
 				cout << ". Insert a valid vertex index!\n";
@@ -303,7 +274,7 @@ void Project::testDijkstra() {
 
 		Node dest = getVertexByNodeId(idDest)->getInfo();
 
-		vector<Edge<Node>*> path = getDijkstraPath(dest);
+		vector<Edge<Node>*> path = getPath(dest);
 		if (path.size() > 0) {
 			cout << "\n. Path from vertex " << start.getId()
 				<< " to vertex " << dest.getId() << ": ";
@@ -326,8 +297,8 @@ void Project::testAstar() {
 	int idStart, idDest;
 	bool validIndex;
 
-	resetGv();
-
+	cleanGv();
+	
 	do {
 		validIndex = false;
 
@@ -335,7 +306,7 @@ void Project::testAstar() {
 		cin >> idStart;
 		cin.ignore();
 
-		if (idStart > 0 && idStart < graph->getNumVertex())
+		if (idStart > 0 && idStart <= graph->getNumVertex())
 			validIndex = true;
 		else
 			cout << ". Insert a valid vertex index!\n";
@@ -351,90 +322,30 @@ void Project::testAstar() {
 		cin >> idDest;
 		cin.ignore();
 
-		if (idDest > 0 && idDest < graph->getNumVertex())
+		if (idDest > 0 && idDest <= graph->getNumVertex())
 			validIndex = true;
 		else
 			cout << ". Insert a valid vertex index!\n";
 
 	} while (!validIndex);
-
+	
 	Node dest = getVertexByNodeId(idDest)->getInfo();
-
-	graph->AstarShortestPath(start, dest);
-
-	vector<Edge<Node>*> path = getAstarPath(dest);
-	if (path.size() > 0) {
+	
+	if (existsPath(start, dest)) {
+		vector<Edge<Node>*> path = getPath(dest);
+		graph->aStarShortestPath(start, dest);
 		cout << "\n. Path from vertex " << start.getId()
-				<< " to vertex " << dest.getId() << ": ";
+			<< " to vertex " << dest.getId() << ": ";
 		this->printPath(path);
 	}
 	else cout << "\nNo path available!\n";
-
 	cout << endl;
 
+	graph->randomizeNumVehicles();
 	updateGv();
 }
 
-template<class T>
-void Graph<T>::AstarShortestPath(const T & s, const T & f){
-
-	vector<Vertex<T>*> open_list;
-	vector<Vertex<T>*> closed_list;
-
-	for (Vertex<T>* v : vertexSet) {
-		Node n = v->getInfo();
-		v->dist = n.calcDist(f);
-		v->gCost = 0;
-		v->fCost = 0;
-		v->path = NULL;
-		v->processing = false;
-	}
-
-	Vertex<T> *v = findVertex(s);
-	v->processing = true;
-	open_list.push_back(v);
-
-	make_heap(open_list.begin(), open_list.end(), fCostGreaterThan<T>());
-
-	while(!open_list.empty()){
-
-		//find the node with lower dist on the open list and pop it
-		pop_heap(open_list.begin(), open_list.end(), fCostGreaterThan<T>());
-		Vertex<T>* current = open_list.back();
-
-		Vertex<T> *target = findVertex(f);
-		if(current == target){
-			return;
-		}
-
-		for(Edge<T>* e : current->adj){
-			Vertex<T> *d = e->dest;
-
-			if(d->gCost > current->gCost + e->weight || !d->processing){
-				d->gCost = current->gCost + e->weight;
-				d->fCost = d->dist + d->gCost;
-				d->path = e;
-
-				if(!d->processing){
-					d->processing = true;
-					open_list.push_back(d);
-				}
-			}
-
-			pop_heap(open_list.begin(), open_list.end(), fCostGreaterThan<T>());
-			Vertex<T>* vert = open_list.back();
-			vert->processing = false;
-			closed_list.push_back(vert);
-		}
-
-		current->processing = false;
-		closed_list.push_back(current);
-	}
-
-}
-
 void Project::reportAccident() {
-
 	int id;
 	Edge<Node>* e = NULL;
 
@@ -472,9 +383,12 @@ void Project::printTraffic() {
 	else cout << ". Currently there's no traffic!\n\n";
 }
 
-void Project::divertTraffic() {
+void Project::divertTraffic(string algorithm) {
+
+	chrono::high_resolution_clock::time_point start, finish;
+	_int64 totalProcessingTime = 0;
+
 	int numVehicles = traffic->size();
-	double totalDijkstraTime = 0;
 	Vehicle* v = NULL;
 
 	if (!traffic->empty()) {
@@ -484,13 +398,24 @@ void Project::divertTraffic() {
 
 			v = traffic->front();
 			traffic->pop();
+			
+			if (traffic->empty())
+				v->resetVehicleId();
 
-			auto start = chrono::high_resolution_clock::now();
-			graph->dijkstraShortestPath(v->getStartNode());
-			auto finish = chrono::high_resolution_clock::now();
-			totalDijkstraTime += chrono::duration_cast<chrono::microseconds>(finish - start).count();
+			if (algorithm == "DIJKSTRA") {
+				start = chrono::high_resolution_clock::now();
+				graph->dijkstraShortestPath(v->getStartNode());
+				finish = chrono::high_resolution_clock::now();
+			}
+			else if (algorithm == "ASTAR" && existsPath(v->getStartNode(), v->getDestNode())) {
+				start = chrono::high_resolution_clock::now();
+				graph->aStarShortestPath(v->getStartNode(), v->getDestNode());
+				finish = chrono::high_resolution_clock::now();
+			}
 
-			vector<Edge<Node>*> path = getDijkstraPath(v->getDestNode());
+			totalProcessingTime += chrono::duration_cast<chrono::microseconds>(finish - start).count();
+
+			vector<Edge<Node>*> path = getPath(v->getDestNode());
 			cout << ". Path for vehicle " << v->getId() << ": ";
 			printPath(path);
 			Sleep(2000);
@@ -500,11 +425,33 @@ void Project::divertTraffic() {
 			graph->randomizeNumVehicles();
 		}
 
-		cout << ". Dijkstra processing average time (micro-seconds) = "
-			<< (totalDijkstraTime / (graph->getNumVertex())) << endl;
+		if (algorithm == "DIJKSTRA")
+			cout << ". Dijkstra processing average time (micro-seconds) = ";
+		else if (algorithm == "ASTAR")
+			cout << ". A* processing average time (micro-seconds) = ";
+		cout << (totalProcessingTime / (graph->getNumVertex())) << endl;
 	}
 	else cout << ". No traffic to be processed!\n";
 	cout << endl;
+}
+
+vector<Edge<Node>*> Project::getPath(Node dest) {
+	vector<Edge<Node>*> fullPath;
+
+	Vertex<Node>* v = graph->findVertex(dest);
+	while (v->getPath() != NULL) {
+		fullPath.push_back(v->getPath());
+		v = v->getPath()->getSrc();
+	}
+	return fullPath;
+}
+
+bool Project::existsPath(Node src, Node dest) {
+	graph->dijkstraShortestPath(src);
+	vector<Edge<Node>*> path = getPath(dest);
+	if (path.size() > 0) 
+		return true;
+	return false;
 }
 
 void Project::printPath(vector<Edge<Node>*> path) {
@@ -517,11 +464,9 @@ void Project::printPath(vector<Edge<Node>*> path) {
 		for (size_t i = path.size() - 1;; i--) {
 			Edge<Node>* edge = path.at(i);
 
-			// paint path edges on the Gv
 			gv->setEdgeThickness(path.at(i)->getId(), 3);
 			gv->setEdgeColor(path.at(i)->getId(), YELLOW);
 
-			// paint path nodes on the Gv and on the CLI
 			pathStr << edge->getSrc()->getInfo().getId() << "->";
 			if (i != 0) {
 				if (i == path.size() - 1)
@@ -541,7 +486,7 @@ void Project::printPath(vector<Edge<Node>*> path) {
 
 void Project::printAllPaths() {
 	for (Vertex<Node>* vertex : graph->getVertexSet()) {
-		vector<Edge<Node>*> path = getDijkstraPath(vertex->getInfo());
+		vector<Edge<Node>*> path = getPath(vertex->getInfo());
 		if (path.size() > 0) {
 			cout << "to Vertex " << vertex->getInfo().getId() << ": ";
 			printPath(path);

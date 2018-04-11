@@ -3,7 +3,6 @@
 #include <vector>
 #include <queue>
 #include <list>
-#include <iostream>
 #include <limits>
 #include <cmath>
 using namespace std;
@@ -11,7 +10,6 @@ using namespace std;
 template <class T> class Edge;
 template <class T> class Graph;
 template <class T> class Vertex;
-class Node;
 
 #define INF std::numeric_limits<double>::max()
 
@@ -24,7 +22,7 @@ class Vertex {
 	int indegree;          
 
 	Edge<T>* path;		
-	double dist;
+	double dist;	
 	double gCost;
 	double fCost;
 
@@ -36,6 +34,7 @@ public:
 	vector<Edge<T>*> getAdj() const;
 	Edge<T>* getPath() const;
 	double getDist() const;
+	double getGCost() const;
 	double getFCost() const;
 	bool operator== (const Vertex<T> &v);
 	friend class Graph<T>;
@@ -65,8 +64,13 @@ double Vertex<T>::getDist() const {
 }
 
 template <class T>
-double Vertex<T>::getFCost() const{
+double Vertex<T>::getFCost() const {
 	return fCost;
+}
+
+template <class T>
+double Vertex<T>::getGCost() const {
+	return gCost;
 }
 
 template <class T>
@@ -90,6 +94,13 @@ bool Vertex<T>::operator== (const Vertex<T> &v) {
 }
 
 template <class T>
+struct vertexPointerGreatherThan {
+	bool operator()(Vertex<T>* v1, Vertex<T>* v2) {
+		return v1->getDist() > v2->getDist();
+	}
+};
+
+template <class T>
 struct fCostGreaterThan {
 	bool operator()(Vertex<T>* v1, Vertex<T>* v2) {
 		return v1->getFCost() > v2->getFCost();
@@ -97,15 +108,9 @@ struct fCostGreaterThan {
 };
 
 template <class T>
-struct vertexPointerGreatherThan {
-	bool operator()(Vertex<T>* v1, Vertex<T>* v2) {
-		return v1->getDist() > v2->getDist();
-	}
-};
-
-
-template <class T>
 class Edge {
+
+private:
 	static int edgeId;
 	int id;
 	Vertex<T> *src;
@@ -113,6 +118,7 @@ class Edge {
 	double weight;
 	int maxNumVehicles;
 	int currentNumVehicles;
+
 public:
 	Edge(Vertex<T> *s, Vertex<T> *d, double w);
 	int getId() const;
@@ -179,6 +185,7 @@ bool Edge<T>::operator== (const Edge<T> edge) {
 	return dest->getInfo() == edge.dest->getInfo() && weight == edge.weight;
 }
 
+
 template <class T>
 class Graph {
 	vector<Vertex<T>*> vertexSet;   
@@ -198,7 +205,7 @@ public:
 
 	void randomizeNumVehicles();
 	void dijkstraShortestPath(const T &s);
-	void AstarShortestPath(const T &s, const T &e);
+	void aStarShortestPath(const T & s, const T & f);
 };
 
 template<class T>
@@ -257,8 +264,8 @@ void Graph<T>::randomizeNumVehicles() {
 	for (Vertex<T>* v : vertexSet)
 		for (Edge<T>* e : v->getAdj())
 			if (e->currentNumVehicles != e->maxNumVehicles) {
-				numNewVehicles = rand() % (e->maxNumVehicles - e->currentNumVehicles);
-				if (rand() % 100 > 30)
+				numNewVehicles = (rand() % (e->maxNumVehicles - e->currentNumVehicles)) / 4;
+				if (rand() % 100 > 50)
 					e->currentNumVehicles += numNewVehicles;
 				else {
 					e->currentNumVehicles -= numNewVehicles;
@@ -335,5 +342,67 @@ void Graph<T>::dijkstraShortestPath(const T & s) {
 				make_heap(p_queue.begin(), p_queue.end(), vertexPointerGreatherThan<T>());
 			}
 		}
+	}
+}
+
+template<class T>
+void Graph<T>::aStarShortestPath(const T & s, const T & f) {
+
+	vector<Vertex<T>*> open_list;
+	vector<Vertex<T>*> closed_list;
+
+	for (Vertex<T>* v : vertexSet) {
+		Node n = v->getInfo();
+		v->dist = n.calcDist(f);
+		v->gCost = 0;
+		v->fCost = 0;
+		v->path = NULL;
+		v->processing = false;
+	}
+
+	Vertex<T> *v = findVertex(s);
+	v->processing = true;
+	open_list.push_back(v);
+
+	
+
+	while (!open_list.empty()) {
+
+		make_heap(open_list.begin(), open_list.end(), fCostGreaterThan<T>());
+		
+		Vertex<T>* current = open_list.back();
+
+		open_list.pop_back();
+		pop_heap(open_list.begin(), open_list.end());
+		
+		Vertex<T> *target = findVertex(f);
+		if (current == target) return;
+
+		for (Edge<T>* e : current->adj) {
+			Vertex<T> *d = e->dest;
+			
+			if (d->gCost > current->gCost + e->weight || !d->processing) {
+				d->gCost = current->gCost + e->weight;
+				d->fCost = d->dist + d->gCost;
+				d->path = e;
+
+				if (!d->processing) {
+					d->processing = true;
+					open_list.push_back(d);
+				}
+			}
+
+			make_heap(open_list.begin(), open_list.end(), fCostGreaterThan<T>());
+
+			Vertex<T>* vert = open_list.back();
+
+			open_list.pop_back();
+			pop_heap(open_list.begin(), open_list.end());
+			vert->processing = false;
+			closed_list.push_back(vert);
+		}
+
+		current->processing = false;
+		closed_list.push_back(current);
 	}
 }
