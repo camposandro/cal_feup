@@ -18,7 +18,6 @@ public:
 	bool operator== (const Point &point);
 };
 
-
 class Node {
 	
 private:

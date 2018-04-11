@@ -170,7 +170,6 @@ void Project::openWindowGv() {
 	gv->createWindow(600, 600);
 	gv->defineVertexColor("blue");
 	gv->defineEdgeColor("black");
-	//gv->defineEdgeCurved(false);
 }
 
 void Project::loadNodesGv() {
@@ -465,11 +464,9 @@ void Project::printPath(vector<Edge<Node>*> path) {
 		for (size_t i = path.size() - 1;; i--) {
 			Edge<Node>* edge = path.at(i);
 
-			// paint path edges on the Gv
 			gv->setEdgeThickness(path.at(i)->getId(), 3);
 			gv->setEdgeColor(path.at(i)->getId(), YELLOW);
 
-			// paint path nodes on the Gv and on the CLI
 			pathStr << edge->getSrc()->getInfo().getId() << "->";
 			if (i != 0) {
 				if (i == path.size() - 1)
