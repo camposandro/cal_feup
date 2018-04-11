@@ -20,38 +20,42 @@ class Project {
 private:
 	Graph<Node> *graph;
 	GraphViewer *gv;
-	std::queue<Vehicle*> traffic;
+	std::queue<Vehicle*> *traffic;
 
 public:
 	Project();
+
 	Graph<Node> *getGraph();
 	GraphViewer *getGV();
 	void setGraph(Graph<Node> *graph);
 	void setGV(GraphViewer *gv);
+	Vertex<Node>* getVertexByNodeId(int idNode);
+	vector<Edge<Node>*> getDijkstraPath(Node dest);
+	vector<Edge<Node>*> getAstarPath(Node dest);
 
-	void resetGraph();
 	void generateRandomGraph();
 	void generateRandomTraffic();
 	void readNodesFile();
 	void readEdgesFile();
 	void readTrafficFile();
+	void resetGraph();
+	void resetTraffic();
 
 	void openWindowGv();
 	void loadNodesGv();
 	void loadEdgesGv();
 	void printGv();
 	void updateGv();
+	void cleanGv();
 	void resetGv();
 
 	void testDijkstra();
 	void testAstar();
 
-	Vertex<Node>* getVertexByNodeId(int idNode);
-	vector<Edge<Node>*> getDijkstraPath(Node dest);
-	vector<Edge<Node>*> getAstarPath(Node dest);
-	void printAllPaths();
-	void printPath(vector<Edge<Node>*> path);
-
 	void reportAccident();
+	void printTraffic();
 	void divertTraffic();
+
+	void printPath(vector<Edge<Node>*> path);
+	void printAllPaths();
 };
