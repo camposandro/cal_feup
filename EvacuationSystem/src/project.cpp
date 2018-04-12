@@ -34,8 +34,8 @@ void Project::generateRandomGraph() {
 	int numNodes, numEdges, destIndex;
 
 	do {
-		numNodes = rand() % 30;
-	} while (numNodes == 0);
+		numNodes = rand() % 15;
+	} while (numNodes < 3);
 
 	for (int i = 0; i < numNodes; i++)
 		graph->addVertex(Node(rand() % 600, rand() % 600));
@@ -44,7 +44,7 @@ void Project::generateRandomGraph() {
 		Node startNode = v->getInfo();
 		
 		do {
-			numEdges = rand() % 5;
+			numEdges = rand() % 3;
 		} while (numEdges == 0);
 		
 		for (int j = 0; j < numEdges; j++) {
@@ -65,7 +65,7 @@ void Project::generateRandomTraffic() {
 	if (traffic->empty()) {
 		do {
 			numVehicles = rand() % 10;
-		} while (numVehicles == 0);
+		} while (numVehicles < 3);
 
 		for (int i = 0; i < numVehicles; i++) {
 			startIndex = rand() % graph->getNumVertex();
@@ -170,6 +170,7 @@ void Project::openWindowGv() {
 	gv->createWindow(600, 600);
 	gv->defineVertexColor("blue");
 	gv->defineEdgeColor("black");
+	//gv->defineEdgeCurved(false);
 }
 
 void Project::loadNodesGv() {
@@ -198,7 +199,8 @@ void Project::printGv() {
 void Project::updateGv() {
 	for (Vertex<Node>* vertex : graph->getVertexSet()) {
 		for (Edge<Node>* e : vertex->getAdj()) {
-			string label = "ID " + to_string(e->getId()) + " - " +
+			string label = "ID " + to_string(e->getId()) + ", dist = " + 
+				to_string((int) e->getWeight()) + ", " +
 				to_string(e->getCurrentNumVehicles()) +
 				" | " + to_string(e->getMaxNumVehicles());
 
@@ -464,9 +466,11 @@ void Project::printPath(vector<Edge<Node>*> path) {
 		for (size_t i = path.size() - 1;; i--) {
 			Edge<Node>* edge = path.at(i);
 
+			// paint path edges on the Gv
 			gv->setEdgeThickness(path.at(i)->getId(), 3);
 			gv->setEdgeColor(path.at(i)->getId(), YELLOW);
 
+			// paint path nodes on the Gv and on the CLI
 			pathStr << edge->getSrc()->getInfo().getId() << "->";
 			if (i != 0) {
 				if (i == path.size() - 1)

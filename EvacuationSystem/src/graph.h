@@ -265,7 +265,7 @@ void Graph<T>::randomizeNumVehicles() {
 		for (Edge<T>* e : v->getAdj())
 			if (e->currentNumVehicles != e->maxNumVehicles) {
 				numNewVehicles = (rand() % (e->maxNumVehicles - e->currentNumVehicles)) / 4;
-				if (rand() % 100 > 50)
+				if (rand() % 100 > 40)
 					e->currentNumVehicles += numNewVehicles;
 				else {
 					e->currentNumVehicles -= numNewVehicles;
