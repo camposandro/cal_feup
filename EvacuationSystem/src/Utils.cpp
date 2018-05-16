@@ -203,3 +203,49 @@ int processInput(int inf, int sup) {
 
 	return option;
 }
+
+/* Knuth-Morris-Pratt Algorithm */
+
+
+void cpf(string p, int pi[]) {
+	int m = p.length();
+	pi[0] = 0;
+	int k = 0;
+	for(int q = 1; q<m; q++){
+		while(k>0 && p[k]!=p[q]){
+			k = pi[k];
+		}
+		if(p[k]==p[q]){
+			k++;
+		}
+		pi[q] = k;
+	}
+	return;
+}
+
+int kmpMatcher(string text, string pattern) {
+	int count = 0;
+	int n = text.length();
+	int m = pattern.length();
+	int pi[text.length()];
+	cpf(pattern, pi);
+	int q = 0;
+	for(int i = 0; i < n; i++){
+		while(q>0 && pattern[q] != text[i]){
+			q = pi[q-1];
+		}
+		if(pattern[q] == text[i]){
+			q++;
+		}
+		if(q==m){
+			q = pi[q-1];
+			count++;
+		}
+	}
+	return count;
+}
+
+
+
+
+
