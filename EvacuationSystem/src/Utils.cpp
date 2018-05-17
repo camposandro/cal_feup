@@ -245,6 +245,37 @@ int kmpMatcher(string text, string pattern) {
 	return count;
 }
 
+/* edit distance for approximate string matching */
+
+int editDistance(string pattern, string text) {
+	int P = pattern.length();
+	int T = text.length();
+	int min1 = 0;
+	vector<int> D(T + 1);
+	int old_d, new_d;
+
+	for(int j = 0; j <= T; j++){
+		D[j] = j;
+	}
+
+	for(int i = 1; i <= P; i++){
+		old_d = D[0];
+		D[0] = i;
+		for(int j = 1; j <= T; j++){
+			if(pattern[i - 1] == text[j - 1])
+				new_d = old_d;
+			else{
+				new_d = 1 + min(min(old_d, D[j]), D[j-1]);
+			}
+
+			old_d = D[j];
+			D[j] = new_d;
+		}
+	}
+
+	return D[T];
+}
+
 
 
 
