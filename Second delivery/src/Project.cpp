@@ -273,7 +273,7 @@ Vertex<Node>* Project::getUserVertex(string type) {
 			cout << ". Insert a valid vertex index!\n";
 
 	} while (!validIndex);
-	
+
 	return getVertexByNodeId(id);
 }
 
@@ -287,7 +287,7 @@ Edge<Node>* Project::getUserRoad(string type) {
 	do {
 		validRoad = false;
 
-		cout << "-> Insert " << type << " road name: ";
+		cout << "\n-> Insert " << type << " road name: ";
 		getline(cin, road);
 
 		edge = kmpSearch(road);
@@ -296,9 +296,8 @@ Edge<Node>* Project::getUserRoad(string type) {
 			if (road != edge->getName()) {
 				cout << ". Did you mean \""
 					<< edge->getName()
-					<< "\" (Y/N)? " << endl;
+					<< "\" (Y/N)? ";
 
-				cout << "-> Option: ";
 				cin >> answer;
 				answer = toupper(answer);
 				cin.ignore();
@@ -346,27 +345,30 @@ void Project::dijkstra(string mode) {
 	char answer;
 	Node start, dest;
 
+	cleanGv();
+
 	Vertex<Node>* startVertex;
 	Edge<Node>* startEdge;
 
 	if (mode == "ID") {
 		startVertex = getUserVertex("start");
 		start = startVertex->getInfo();
+
+		do {
+			cout << ". Print all paths ? (Y/N) ";
+			cin >> answer;
+			answer = toupper(answer);
+			cin.ignore();
+		} while (answer != 'Y' && answer != 'N');
 	}
 	else if (mode == "NAME") {
+		answer = 'N';
 		startEdge = getUserRoad("start");
 		start = startEdge->getDest()->getInfo();
 	}
 
 	graph->dijkstraShortestPath(start);
-
-	do {
-		cout << ". Print all paths ? (Y/N) ";
-		cin >> answer;
-		answer = toupper(answer);
-		cin.ignore();
-	} while (answer != 'Y' && answer != 'N');
-
+	
 	Vertex<Node>* destVertex;
 	Edge<Node>* destEdge;
 
@@ -377,41 +379,42 @@ void Project::dijkstra(string mode) {
 		}
 		else if (mode == "NAME") {
 			destEdge = getUserRoad("destiny");
-			dest = destEdge->getDest()->getInfo();
+			dest = destEdge->getSrc()->getInfo();
 		}
 
 		vector<Edge<Node>*> path = getPath(dest);
-
+		
 		if (mode == "ID") {
 			if (path.size() > 0) {
-				cout << "\n. Path from Vertex " << start.getId()
+				cout << "\n. Path from vertex " << start.getId()
 					<< " to vertex " << dest.getId() << ": ";
-				this->printPath(path);
+				this->printPath(path, "ID");
 			}
-			else cout << "\nNo path available!\n";
+			else cout << "\n. No path available!\n";
 		}
 		else if (mode == "NAME") {
 			if (path.size() == 0) {
-				dest = destEdge->getSrc()->getInfo();
+				dest = destEdge->getDest()->getInfo();
 				path = getPath(dest);
 			}
 
 			if (path.size() > 0) {
-				path.push_back(startEdge);
-				cout << "\n. Path from Edge " << startEdge->getName()
-					<< " to edge " << destEdge->getName() << ": ";
-				this->printPath(path);
+				cout << "\n. Path from road " << startEdge->getName()
+					<< " to road " << destEdge->getName() << ":\n";
+				cout << startEdge->getName() << "->";
+				this->printPath(path, "NAME");
+				cout << destEdge->getName() << endl;
 			}
-			else cout << "\nNo path available!\n";
+			else cout << "\n. No path available!\n";
 		}
 
 		cout << endl;
 	}
 	else {
 		if (mode == "ID")
-			cout << "\n. Available paths from Vertex " << start.getId() << ":\n";
+			cout << "\n. Available paths from vertex " << start.getId() << ":\n";
 		else if (mode == "NAME")
-			cout << "\n. Available paths from Edge " << startEdge->getName() << ":\n";
+			cout << "\n. Available paths from road " << startEdge->getName() << ":\n";
 
 		this->printAllPaths();
 	}
@@ -422,10 +425,11 @@ void Project::dijkstra(string mode) {
 
 void Project::aStar(string mode) {
 	Node start, dest;
-
 	Vertex<Node>* startVertex;
 	Edge<Node>* startEdge;
-	
+
+	cleanGv();
+
 	if (mode == "ID") {
 		startVertex = getUserVertex("start");
 		start = startVertex->getInfo();
@@ -445,34 +449,41 @@ void Project::aStar(string mode) {
 		if (existsPath(start, dest)) {
 			vector<Edge<Node>*> path = getPath(dest);
 			graph->aStarShortestPath(start, dest);
+
 			cout << "\n. Path from vertex " << start.getId()
 				<< " to vertex " << dest.getId() << ": ";
-			this->printPath(path);
+			this->printPath(path, "ID");
 		}
-		else cout << "\nNo path available!\n";
+		else cout << "\n. No path available!\n";
 	}
 	else if (mode == "NAME") {
 		destEdge = getUserRoad("destiny");
-		dest = destEdge->getDest()->getInfo();
+		dest = destEdge->getSrc()->getInfo();
 
 		if (existsPath(start, dest)) {
 			vector<Edge<Node>*> path = getPath(dest);
 			graph->aStarShortestPath(start, dest);
-			cout << "\n. Path from Edge " << startEdge->getName()
-				<< " to edge " << destEdge->getName() << ": ";
-			this->printPath(path);
+
+			cout << "\n. Path from road " << startEdge->getName()
+				<< " to road " << destEdge->getName() << ":\n";
+			cout << startEdge->getName() << "->";
+			this->printPath(path, "NAME");
+			cout << destEdge->getName() << endl;
 		}
 		else {
-			dest = destEdge->getSrc()->getInfo();
+			dest = destEdge->getDest()->getInfo();
+
 			if (existsPath(start, dest)) {
 				vector<Edge<Node>*> path = getPath(dest);
 				graph->aStarShortestPath(start, dest);
-				cout << "\n. Path from Edge " << startEdge->getName()
-					<< " to edge " << destEdge->getName() << ": ";
-				this->printPath(path);
+
+				cout << "\n. Path from road " << startEdge->getName()
+					<< " to road " << destEdge->getName() << ":\n";
+				cout << startEdge->getName() << "->";
+				this->printPath(path, "NAME");
+				cout << destEdge->getName() << endl;
 			}
-			else
-				cout << "\nNo path available!\n";
+			else cout << "\n. No path available!\n";
 		}
 	}
 	cout << endl;
@@ -534,7 +545,7 @@ void Project::divertTraffic(string algorithm) {
 
 			v = traffic->front();
 			traffic->pop();
-			
+
 			if (traffic->empty())
 				v->resetVehicleId();
 
@@ -553,7 +564,7 @@ void Project::divertTraffic(string algorithm) {
 
 			vector<Edge<Node>*> path = getPath(v->getDestNode());
 			cout << ". Path for vehicle " << v->getId() << ": ";
-			printPath(path);
+			printPath(path, "ID");
 			Sleep(2000);
 
 			cleanGv();
@@ -590,36 +601,38 @@ bool Project::existsPath(Node src, Node dest) {
 	return false;
 }
 
-void Project::printPath(vector<Edge<Node>*> path) {
+void Project::printPath(vector<Edge<Node>*> path, string mode) {
 	ostringstream pathStr;
 
 	if (path.size() == 0) {
-		pathStr << "No path available!";
+		pathStr << "No path available!\n";
 	}
 	else {
-		for (size_t i = path.size() - 1;; i--) {
+		for (size_t i = path.size() - 1 ;; i--) {
 			Edge<Node>* edge = path.at(i);
 
-			// paint path edges on the Gv
 			gv->setEdgeThickness(path.at(i)->getId(), 3);
 			gv->setEdgeColor(path.at(i)->getId(), YELLOW);
 
-			// paint path nodes on the Gv and on the CLI
-			pathStr << edge->getSrc()->getInfo().getId() << "->";
-			if (i != 0) {
-				if (i == path.size() - 1)
-					gv->setVertexColor(edge->getSrc()->getInfo().getId(), RED);
-			}
-			else {
+			if (mode == "ID")
+				pathStr << edge->getSrc()->getInfo().getId() << "->";
+			else if (mode == "NAME" && i != 0)
+				pathStr << edge->getName() << "->";
+
+			if (i == path.size() - 1) 
+				gv->setVertexColor(edge->getSrc()->getInfo().getId(), RED);
+
+			if (i == 0) {
 				gv->setVertexColor(edge->getDest()->getInfo().getId(), GREEN);
-				pathStr << edge->getDest()->getInfo().getId();
+				if (mode == "ID")
+					pathStr << edge->getDest()->getInfo().getId() << endl;
 				break;
 			}
 		}
 	}
 
 	printGv();
-	cout << pathStr.str() << endl;
+	cout << pathStr.str();
 }
 
 void Project::printAllPaths() {
@@ -627,7 +640,7 @@ void Project::printAllPaths() {
 		vector<Edge<Node>*> path = getPath(vertex->getInfo());
 		if (path.size() > 0) {
 			cout << "to Vertex " << vertex->getInfo().getId() << ": ";
-			printPath(path);
+			printPath(path, "ID");
 		}
 	}
 	cout << endl;

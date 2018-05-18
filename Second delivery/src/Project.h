@@ -63,6 +63,6 @@ public:
 
 	vector<Edge<Node>*> getPath(Node dest);
 	bool existsPath(Node src, Node dest);
-	void printPath(vector<Edge<Node>*> path);
+	void printPath(vector<Edge<Node>*> path, string mode);
 	void printAllPaths();
 };

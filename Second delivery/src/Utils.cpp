@@ -235,12 +235,11 @@ int searchOptions() {
 		"-> 2. Search by road name",
 		"-> 0. Return",
 	};
-
+	
 	for (string option : searchOptions)
 		cout << option << endl;
 
 	int option = processInput(0, 2);
-	cout << endl;
 
 	return option;
 }
@@ -281,7 +280,7 @@ int kmpMatcher(string text, string pattern) {
 	int count = 0;
 	int n = text.length();
 	int m = pattern.length();
-	int *pi = new int[n];
+	int pi[100];
 
 	cpf(pattern, pi);
 
@@ -300,8 +299,6 @@ int kmpMatcher(string text, string pattern) {
 		}
 	}
 
-	delete [] pi;
-
 	return count;
 }
 
@@ -317,7 +314,7 @@ vector<string> processString(string str) {
 }
 
 int aproxMatcher(string pattern, string text) {
-	int totEditDist = 0, currEditDist, currTotDist = 0;
+	int totEditDist = 0, currTotDist = 0;
 	vector<string> patternStr, textStr;
 
 	patternStr = processString(pattern);
@@ -331,14 +328,8 @@ int aproxMatcher(string pattern, string text) {
 
 	vector<string>::iterator itPtrn, itText;
 	for (itPtrn = patternStr.begin(); itPtrn != patternStr.end(); itPtrn++) {
-		for (itText = textStr.begin(); itText != textStr.end(); itText++) {
-			currEditDist = editDistance(*itPtrn, *itText);
-			if (currEditDist == 0) {
-				currTotDist /= 2;
-				break;
-			}
-			currTotDist += currEditDist;
-		}
+		for (itText = textStr.begin(); itText != textStr.end(); itText++)
+			currTotDist += editDistance(*itPtrn, *itText);
 		totEditDist += currTotDist;
 	}
 

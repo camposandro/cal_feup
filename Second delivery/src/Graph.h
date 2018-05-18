@@ -15,14 +15,14 @@ template <class T> class Vertex;
 
 template <class T>
 class Vertex {
-	T info;                
-	vector<Edge<T>*> adj;  
-	bool visited;         
-	bool processing;      
-	int indegree;          
+	T info;
+	vector<Edge<T>*> adj;
+	bool visited;
+	bool processing;
+	int indegree;
 
-	Edge<T>* path;		
-	double dist;	
+	Edge<T>* path;
+	double dist;
 	double gCost;
 	double fCost;
 
@@ -115,7 +115,7 @@ private:
 	int id;
 	string name;
 	Vertex<T> *src;
-	Vertex<T> *dest;      
+	Vertex<T> *dest;
 	double weight;
 	int maxNumVehicles;
 	int currentNumVehicles;
@@ -144,7 +144,7 @@ Edge<T>::Edge(Vertex<T> *s, Vertex<T> *d, double w) : id(edgeId++) {
 	this->src = s;
 	this->dest = d;
 	this->weight = w;
-	this->maxNumVehicles = (int) weight;
+	this->maxNumVehicles = (int)weight;
 	this->currentNumVehicles = rand() % maxNumVehicles;
 }
 
@@ -201,7 +201,7 @@ bool Edge<T>::operator== (const Edge<T> edge) {
 
 template <class T>
 class Graph {
-	vector<Vertex<T>*> vertexSet;   
+	vector<Vertex<T>*> vertexSet;
 
 public:
 	vector<Vertex<T> *> getVertexSet() const;
@@ -292,7 +292,7 @@ void Graph<T>::randomizeNumVehicles() {
 					e->currentNumVehicles += numNewVehicles;
 				else {
 					e->currentNumVehicles -= numNewVehicles;
-					if (e->currentNumVehicles < 0) 
+					if (e->currentNumVehicles < 0)
 						e->currentNumVehicles = 0;
 				}
 			}
@@ -335,20 +335,20 @@ void Graph<T>::dijkstraShortestPath(const T & s) {
 		v->path = NULL;
 		v->processing = false;
 	}
-	
+
 	Vertex<T> *v = findVertex(s);
 	v->dist = 0;
 	p_queue.push_back(v);
 
 	make_heap(p_queue.begin(), p_queue.end());
-	
+
 	while (!p_queue.empty()) {
 
 		Vertex<T> *v = p_queue.back();
 
 		p_queue.pop_back();
 		pop_heap(p_queue.begin(), p_queue.end());
-		
+
 		for (Edge<T>* e : v->adj) {
 			Vertex<T> *w = e->dest;
 			if (e->currentNumVehicles < e->maxNumVehicles && w->dist > v->dist + e->weight) {
@@ -356,7 +356,7 @@ void Graph<T>::dijkstraShortestPath(const T & s) {
 				e->currentNumVehicles++;
 				w->dist = v->dist + e->weight;
 				w->path = e;
-				
+
 				if (!w->processing) {
 					w->processing = true;
 					p_queue.push_back(w);
@@ -387,23 +387,23 @@ void Graph<T>::aStarShortestPath(const T & s, const T & f) {
 	v->processing = true;
 	open_list.push_back(v);
 
-	
+
 
 	while (!open_list.empty()) {
 
 		make_heap(open_list.begin(), open_list.end(), fCostGreaterThan<T>());
-		
+
 		Vertex<T>* current = open_list.back();
 
 		open_list.pop_back();
 		pop_heap(open_list.begin(), open_list.end());
-		
+
 		Vertex<T> *target = findVertex(f);
 		if (current == target) return;
 
 		for (Edge<T>* e : current->adj) {
 			Vertex<T> *d = e->dest;
-			
+
 			if (d->gCost > current->gCost + e->weight || !d->processing) {
 				d->gCost = current->gCost + e->weight;
 				d->fCost = d->dist + d->gCost;
@@ -418,7 +418,7 @@ void Graph<T>::aStarShortestPath(const T & s, const T & f) {
 			make_heap(open_list.begin(), open_list.end(), fCostGreaterThan<T>());
 
 			Vertex<T>* vert = open_list.back();
-			
+
 			open_list.pop_back();
 			pop_heap(open_list.begin(), open_list.end());
 			vert->processing = false;
