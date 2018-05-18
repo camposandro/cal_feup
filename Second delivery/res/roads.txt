@@ -1,0 +1,335 @@
+Alameda de 25 de Abril
+Alameda do Prof. Hernani Monteiro
+Avenida de D. Joao II
+Avenida de Fernao de Magalhaes
+Avenida dos Combatentes da Grande Guerra
+Avenida Flor da Rosa
+Bairro da Agra do Amial
+Bairro de Casas Economicas da Azenha
+Bairro de Casas Economicas de Paranhos
+Bairro de Casas Economicas do Amial
+Bairro do Carvalhido
+Bairro do Outeiro
+Bairro do Regado
+Calcada do Monte de S. Joao
+Campo da Asprela
+Colonia do Dr. Manuel Laranjeira
+Estrada da Circunvalacao
+Grupos de Moradias Populares do Carrical
+Largo da Cruz
+Largo da Igreja de Paranhos
+Largo de Mazagao
+Largo de S. Dinis
+Largo do Campo Lindo
+Largo Palmira Milheiro
+Nova Travessa de Vale Formoso
+Praca da Ilha Brava
+Praca das Gardenias
+Praca das Violetas
+Praca de Afonso Pinto de Magalhaes
+Praca de Nove de Abril
+Praca do Cavado
+Praceta das Mimosas
+Praceta de Bernarda Ferreira Lacerda
+Praceta de Francisco Borges
+Praceta Jose Luis Nunes
+Rua Albertina de Sousa Paraiso
+Rua Alexandre Fleming
+Rua Antonio de Sousa e Silva
+Rua Artur Maia Mendes
+Rua Cesar das Neves
+Rua Conde d'Aurora
+Rua D. Frei Vicente da Soledade e Castro
+Rua da Agra do Amial
+Rua da Alegria
+Rua da Alianca
+Rua da Amieira
+Rua da Areosa
+Rua da Arroteia
+Rua da Asprela
+Rua da Azenha
+Rua da Cidade de Vigo
+Rua da Constituicao
+Rua da Cruz
+Rua da Fonte do Outeiro
+Rua da Igreja da Areosa
+Rua da Igreja de Paranhos
+Rua da Ilha Terceira
+Rua da Ilha Verde
+Rua da Nataria
+Rua da Ribeira Grande
+Rua da Telheira
+Rua da Via-Sacra
+Rua Daniel Constant
+Rua das Anemonas
+Rua das Artes
+Rua das Azaleas
+Rua das Barrocas
+Rua das Begonias
+Rua das Berlengas
+Rua das Cravinas
+Rua das Dalias
+Rua das Desertas
+Rua das Hortensias
+Rua das Magnolias
+Rua das Margaridas
+Rua das Merces
+Rua das Papoilas
+Rua das Rosas
+Rua das Tulipas
+Rua de Abeilard Gomes da Silva
+Rua de Acacio Lino
+Rua de Agostinho de Campos
+Rua de Alberto Carlos Correia da Silva
+Rua de Alberto Sampaio
+Rua de Alcacer Ceguer
+Rua de Alvaro de Casteloes
+Rua de Amalia Luazes
+Rua de Amandio Tavares
+Rua de Americo Gomes
+Rua de Angelo Frondoni
+Rua de Antero de Quental
+Rua de Antonio Augusto Pinto Felix
+Rua de Antonio Borges
+Rua de Antonio Candido
+Rua de Antonio Jose da Silva
+Rua de Armando Cardoso
+Rua de Armando Laroze Rocha
+Rua de Artur de Paiva
+Rua de Arzila
+Rua de Assis Vaz
+Rua de Augusto Lessa
+Rua de Aurelio da Paz dos Reis
+Rua de Aval de Baixo
+Rua de Aval de Cima
+Rua de Avelar Brotero
+Rua de Azinhaga do Monte
+Rua de Barata Feyo
+Rua de Benjamim Gouveia
+Rua de Bento Junior
+Rua de Bolama
+Rua de Campolide
+Rua de Carlos Carneiro
+Rua de Carlos da Maia
+Rua de Carvalho Araujo
+Rua de Cassiano Branco
+Rua de Contumil
+Rua de Costa Cabral
+Rua de Costa e Almeida
+Rua de Cunha Junior
+Rua de Delfim de Brito Guimaraes
+Rua de Delfim Maia
+Rua de Diogo Cao
+Rua de Dionisio dos Santos Silva
+Rua de Faria Guimaraes
+Rua de Guilhermina Suggia
+Rua de Heitor Campos Monteiro
+Rua de Henrique Medina
+Rua de Hernani Torres
+Rua de Honorio de Lima
+Rua de Jeronimo Mendonca
+Rua de Joao Corregedor da Fonseca
+Rua de Joao Lucio de Azevedo
+Rua de Joao Roby
+Rua de Joaquim Kopke
+Rua de Jose Maria Pedroto
+Rua de Julio Ramos
+Rua de Leonardo Coimbra
+Rua de Lima Junior
+Rua de Luis de Aguiar
+Rua de Luis Woodhouse
+Rua de Luz Soriano
+Rua de Maio
+Rua de Manuel Goncalves Pereira de Barros
+Rua de Maria Pia
+Rua de Mario Bonito
+Rua de Marques Abreu
+Rua de Marques de Oliveira
+Rua de Martins Sarmento
+Rua de Monsanto
+Rua de Nicolau Marques Guedes
+Rua de Nove de Abril
+Rua de Oliveira Martins
+Rua de Oscar da Silva
+Rua de Pedro Ivo
+Rua de Pedro Teixeira
+Rua de Pereira Reis
+Rua de Poente da Colonia Dr. Manuel Laranjeira
+Rua de Porto Santo
+Rua de Raul Caldevilla
+Rua de Ribeiro de Sousa
+Rua de Rodrigues Semide
+Rua de Rogerio de Azevedo
+Rua de S. Dinis
+Rua de S. Frei
+Rua de S. Jorge
+Rua de S. Tome
+Rua de S. Verissimo
+Rua de Sa de Miranda
+Rua de Santa Justa
+Rua de Santa Luzia
+Rua de Santa Maria
+Rua de Santiago
+Rua de Santo Antao
+Rua de Serpa Pinto
+Rua de Silva Porto
+Rua de Silva Tapada
+Rua de Sousa Caldas
+Rua de Sousa Pinto
+Rua de Vale Formoso
+Rua de Vasco de Lima Couto
+Rua de Vitorino Damasio
+Rua Diamantina
+Rua do Abade Correia da Serra
+Rua do Academico Futebol Club
+Rua do Actor Eduardo Brazao
+Rua do Actor Ferreira da Silva
+Rua do Agueda
+Rua do Almirante Leote do Rego
+Rua do Alto
+Rua do Amial
+Rua do Arquitecto Lobao Vital
+Rua do Ave
+Rua do Baca
+Rua do Bairro da Areosa
+Rua do Campo Lindo
+Rua do Cantor Zeca Afonso
+Rua do Capitao Pombeiro
+Rua do Capuchinhos
+Rua do Cardo
+Rua do Carrical
+Rua do Carvalhido
+Rua do Ciclames
+Rua do Coa
+Rua do Conde de Avranches
+Rua do Conde de Campo Bello
+Rua do Corgo
+Rua do Coronel Almeida Valente
+Rua do Corvo
+Rua do Covelo
+Rua do Cunha
+Rua do Dr. Adriano de Paiva
+Rua do Dr. Antonio Bernardino de Almeida
+Rua do Dr. Antonio Coelho
+Rua do Dr. Carlos Ramos
+Rua do Dr. Carteado Mena
+Rua do Dr. Eduardo Santos Silva
+Rua do Dr. Joaquim Pires de Lima
+Rua do Dr. Julio de Matos
+Rua do Dr. Lopo de Carvalho
+Rua do Dr. Manuel Laranjeira
+Rua do Dr. Manuel Pereira da Silva
+Rua do Dr. Pedro Augusto Ferreira
+Rua do Dr. Pedro Dias
+Rua do Dr. Placido da Costa
+Rua do Dr. Roberto Frias
+Rua do Encontro
+Rua do Eng.º Carlos Amarante
+Rua do Eng.º Guilherme Bonfim Barreiros
+Rua do Eng.º Machado Vaz
+Rua do Estrela e Vigorosa Sport
+Rua do Fogo
+Rua do Guadiana
+Rua do Lindo Vale
+Rua do Liz
+Rua do Mestre Guilherme Camarinha
+Rua do Mondego
+Rua do Monte Alegre
+Rua do Monte de S. Joao
+Rua do Monte dos Burgos
+Rua do Neiva
+Rua do Niassa
+Rua do Padre Jose Pacheco do Monte
+Rua do Padre Rebelo da Costa
+Rua do Pico
+Rua do Principe
+Rua do Prof. Agostinho da Silva
+Rua do Prof. Bento de Jesus Caraca
+Rua do Prof. Correia de Araujo
+Rua do Prof. Duarte Leite
+Rua do Prof. Mendes Correia
+Rua do Relogio
+Rua do Sado
+Rua do Sal
+Rua do Salgueiral
+Rua do Tamega
+Rua do Tejo
+Rua do Tenente Mario Grilo
+Rua do Trevo
+Rua do Tua
+Rua do Vez
+Rua do Visconde de Setubal
+Rua do Vouga
+Rua do Zaire
+Rua do Zambeze
+Rua do Zezere
+Rua dos Cravos
+Rua dos Crisantemos
+Rua dos Jasmins
+Rua dos Junquilhos
+Rua dos Lirios
+Rua dos Miosotis
+Rua dos Rainunculos
+Rua Engenheiro Nuno de Meireles
+Rua Florinha da Abrigada
+Rua Francisco de Sena Esteves
+Rua Henrique de Sousa Reis
+Rua Horacio Marcal
+Rua Irma Maria Droste
+Rua Joao Allen
+Rua Jorge Gigante
+Rua Julio Amaral de Carvalho
+Rua Luis Neves Real
+Rua Maria Peregrina de Sousa
+Rua Nascente da Colonia Dr. Manuel Laranjeira
+Rua Nova do Regado
+Rua Nova do Rio
+Rua Nova do Tronco
+Rua Particular da Arroteia
+Rua Particular da Tapada de Santo Antonio
+Rua Particular de Monsanto
+Rua Particular Diamantina
+Rua Prof. Antonio Cruz
+Rua Prof. Armando de Castro
+Rua Professor Joaquim Bastos
+Rua Raul Castro
+Travessa da Areosa
+Travessa da Asprela
+Travessa da Bica Velha
+Travessa da Bouca
+Travessa da Calcada
+Travessa da Ferreira
+Travessa da Fonte do Outeiro
+Travessa da Laje
+Travessa da Tapada de Santo Antonio
+Travessa da Via-Sacra
+Travessa das Barrocas
+Travessa de Alvaro de Casteloes
+Travessa de Augusto Lessa
+Travessa de Cortes
+Travessa de Dionisio dos Santos Silva
+Travessa de Faria Guimaraes
+Travessa de Lamas
+Travessa de Luz Soriano
+Travessa de Monsanto
+Travessa de Nove de Abril
+Travessa de Ribeiro de Sousa
+Travessa de S. Dinis
+Travessa de Silva Porto
+Travessa Diamantina
+Travessa do Bairro da Areosa
+Travessa do Campo Lindo
+Travessa do Carvalhido
+Travessa do Covelo
+Travessa do Dr. Barros
+Travessa do Monte de S. Joao
+Travessa do Paiol
+Travessa do Regado
+Travessa do Ribeiro
+Travessa do Rio
+Travessa do Veloso
+Travessa Nova de Currais
+Travessa Nova do Covelo
+Via de Cintura Interna
+Viela da Bouca
+Viela de Lamas
