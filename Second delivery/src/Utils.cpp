@@ -325,19 +325,17 @@ int aproxMatcher(string pattern, string text) {
 	int textSize = textStr.size();
 	int diffSize = abs(ptrnSize - textSize);
 
-	if (diffSize > 0) totEditDist += diffSize;
+	if (diffSize > 0) 
+		totEditDist += diffSize;
 
 	vector<string>::iterator itPtrn, itText;
 	for (itPtrn = patternStr.begin(); itPtrn != patternStr.end(); itPtrn++) {
 		for (itText = textStr.begin(); itText != textStr.end(); itText++) {
 			currEditDist = editDistance(*itPtrn, *itText);
-			if (currEditDist == 0) {
-				currTotDist /= 2;
-				break;
-			}
 			currTotDist += currEditDist;
+			if (currEditDist == 0) 
+				break;
 		}
-
 		totEditDist += currTotDist;
 	}
 
@@ -388,9 +386,6 @@ vector<Edge<Node>*> getSimRoads(vector<Edge<Node>*> edges, string road) {
 		heap.push_back(pair<int, Edge<Node>*>(value, *it));
 	}
 	sort(heap.begin(), heap.end(), cmpSimRoads());
-
-	for (auto it = heap.begin(); it != heap.end(); it++)
-		cout << it->first << " | " << it->second->getName() << endl;
 
 	for (auto it = heap.begin(); it != heap.begin() + 3; it++)
 		roads.push_back(it->second);
