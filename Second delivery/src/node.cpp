@@ -2,6 +2,7 @@
 
 #include "Node.h"
 
+
 Point::Point() {
 	coords.first = 0;
 	coords.second = 0;
