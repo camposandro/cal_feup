@@ -1,5 +1,5 @@
 #include <iostream>
-#include <stdafx.h>
+
 #include "Project.h"
 #include "Utils.h"
 

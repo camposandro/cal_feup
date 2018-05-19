@@ -6,7 +6,6 @@
 #include <time.h>
 #include <chrono>
 #include "Project.h"
-#include "stdafx.h"
 
 // Graph Utils
 void graphSelectionMenu(Project * proj);
