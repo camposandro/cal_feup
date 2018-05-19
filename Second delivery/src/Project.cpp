@@ -311,7 +311,7 @@ Edge<Node>* Project::getUserRoad(string type) {
 		else {
 			similarEdges = getSimRoads(graph->getEdges(), road);
 			edge = selectRoad(similarEdges);
-
+			
 			if (edge != NULL)
 				validRoad = true;
 		}
@@ -330,7 +330,6 @@ Edge<Node>* Project::kmpSearch(string road) {
 	for (Vertex<Node>* vertex : graph->getVertexSet()) {
 		for (Edge<Node>* edge : vertex->getAdj()) {
 			aux_edge = edge->getName();
-
 			transform(aux_edge.begin(), aux_edge.end(), aux_edge.begin(), ::tolower);
 
 			count = kmpMatcher(aux_edge, aux_road);

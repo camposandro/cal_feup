@@ -2,7 +2,7 @@
 
 struct cmpSimRoads {
 	bool operator()(pair<int, Edge<Node>*> p1, pair<int, Edge<Node>*> p2) const {
-		return p1.first > p2.first;
+		return p1.first < p2.first;
 	}
 };
 
@@ -24,7 +24,7 @@ void graphSelectionMenu(Project * proj) {
 
 			elapsed = chrono::duration_cast<chrono::microseconds>(finish - start).count();
 			cout << ". Files reading time (micro-seconds) = " << elapsed << endl << endl;
-			
+
 			Sleep(3000);
 			break;
 
@@ -44,10 +44,10 @@ void graphSelectionMenu(Project * proj) {
 			Sleep(3000);
 			break;
 		}
-		
-		#ifdef _WIN32
-			system("cls");
-		#endif
+
+#ifdef _WIN32
+		system("cls");
+#endif
 
 		proj->randomizeRoadNames();
 		proj->openWindowGv();
@@ -60,9 +60,9 @@ void graphSelectionMenu(Project * proj) {
 
 int graphSelectionOptions() {
 
-	#ifdef _WIN32
-		system("cls");
-	#endif
+#ifdef _WIN32
+	system("cls");
+#endif
 
 	cout << "EvacuationSystem - CAL 1718\n";
 	vector<string> graphOptions = {
@@ -117,11 +117,11 @@ int mainMenuOptions() {
 		"-> 4. Report accidents",
 		"-> 0. Leave",
 	};
-	
+
 	for (string option : menuOptions)
 		cout << option << endl;
-	
-	int option = processInput(0,4);
+
+	int option = processInput(0, 4);
 	cout << endl;
 
 	return option;
@@ -235,7 +235,7 @@ int searchOptions() {
 		"-> 2. Search by road name",
 		"-> 0. Return",
 	};
-	
+
 	for (string option : searchOptions)
 		cout << option << endl;
 
@@ -262,6 +262,7 @@ int processInput(int inf, int sup) {
 
 void cpf(string p, int pi[]) {
 	int m = p.length();
+
 	pi[0] = 0;
 
 	int k = 0;
@@ -289,10 +290,10 @@ int kmpMatcher(string text, string pattern) {
 		while (q > 0 && pattern[q] != text[i]) {
 			q = pi[q - 1];
 		}
-			
+
 		if (pattern[q] == text[i])
 			q++;
-		
+
 		if (q == m) {
 			q = pi[q - 1];
 			count++;
@@ -314,7 +315,7 @@ vector<string> processString(string str) {
 }
 
 int aproxMatcher(string pattern, string text) {
-	int totEditDist = 0, currTotDist = 0;
+	int totEditDist = 0, currTotDist = 0, currEditDist;
 	vector<string> patternStr, textStr;
 
 	patternStr = processString(pattern);
@@ -328,8 +329,15 @@ int aproxMatcher(string pattern, string text) {
 
 	vector<string>::iterator itPtrn, itText;
 	for (itPtrn = patternStr.begin(); itPtrn != patternStr.end(); itPtrn++) {
-		for (itText = textStr.begin(); itText != textStr.end(); itText++)
-			currTotDist += editDistance(*itPtrn, *itText);
+		for (itText = textStr.begin(); itText != textStr.end(); itText++) {
+			currEditDist = editDistance(*itPtrn, *itText);
+			if (currEditDist == 0) {
+				currTotDist /= 2;
+				break;
+			}
+			currTotDist += currEditDist;
+		}
+
 		totEditDist += currTotDist;
 	}
 
@@ -339,7 +347,6 @@ int aproxMatcher(string pattern, string text) {
 int editDistance(string pattern, string text) {
 	int P = pattern.length();
 	int T = text.length();
-	int min1 = 0;
 	vector<int> D(T + 1);
 	int old_d, new_d;
 
@@ -356,7 +363,7 @@ int editDistance(string pattern, string text) {
 			else {
 				new_d = 1 + min(min(old_d, D[j]), D[j - 1]);
 			}
-
+			
 			old_d = D[j];
 			D[j] = new_d;
 		}
@@ -366,14 +373,24 @@ int editDistance(string pattern, string text) {
 }
 
 vector<Edge<Node>*> getSimRoads(vector<Edge<Node>*> edges, string road) {
+	string edge;
 	vector<Edge<Node>*> roads;
-
 	vector<pair<int, Edge<Node>*>> heap;
+
+	transform(road.begin(), road.end(), road.begin(), ::tolower);
+
+	int value;
 	for (auto it = edges.begin(); it != edges.end(); it++) {
-		int value = aproxMatcher(road, (*it)->getName());
+		edge = (*it)->getName();
+		transform(edge.begin(), edge.end(), edge.begin(), ::tolower);
+		
+		value = aproxMatcher(road, edge);
 		heap.push_back(pair<int, Edge<Node>*>(value, *it));
 	}
-	make_heap(heap.begin(), heap.end(), cmpSimRoads());
+	sort(heap.begin(), heap.end(), cmpSimRoads());
+
+	for (auto it = heap.begin(); it != heap.end(); it++)
+		cout << it->first << " | " << it->second->getName() << endl;
 
 	for (auto it = heap.begin(); it != heap.begin() + 3; it++)
 		roads.push_back(it->second);
@@ -390,7 +407,7 @@ Edge<Node>* selectRoad(vector<Edge<Node>*> roads) {
 			cout << "[" << i + 1 << "]: "
 			<< roads.at(i)->getName() << endl;
 		cout << "[0]: Try inserting another name\n";
-	
+
 		cout << "-> Option: ";
 		cin >> opt;
 		cin.ignore();
